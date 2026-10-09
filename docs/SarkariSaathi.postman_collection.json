@@ -1,0 +1,1605 @@
+{
+  "info": {
+    "name": "SarkariSaathi AI — Phases 1–5",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000/api"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": "PostmanTest123!"
+    },
+    {
+      "key": "token",
+      "value": ""
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if(pm.info.requestName === 'Health'){const id=Date.now().toString();pm.collectionVariables.set('runId',id);pm.collectionVariables.set('email','postman.'+id+'@example.com');}"
+        ]
+      }
+    }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/health"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register valid account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 201',()=>pm.response.to.have.status(201));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.collectionVariables.set('token',pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Duplicate email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409',()=>pm.response.to.have.status(409));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invalid email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"email\": \"invalid\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Short password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"email\": \"{{email}}\",\n  \"password\": \"short\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing name",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing email",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Citizen\",\n  \"email\": \"{{email}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login valid",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.collectionVariables.set('token',pm.response.json().token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wrong password",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"incorrect123\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Unknown account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"nonexistent.{{runId}}@example.com\",\n  \"password\": \"{{password}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Missing login fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Me valid token",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Me missing token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Me invalid token",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer invalid-token"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/me"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile initial empty",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Profile completion 0%',()=>pm.expect(pm.response.json().completion.percentage).to.eql(0));pm.test('Owner metadata is private',()=>pm.expect(pm.response.json().profile.user).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile save draft",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 22,\n  \"state\": null,\n  \"district\": \"\",\n  \"occupation\": null,\n  \"annualHouseholdIncome\": null\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Profile completion 25%',()=>pm.expect(pm.response.json().completion.percentage).to.eql(25));pm.test('Owner metadata is private',()=>pm.expect(pm.response.json().profile.user).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile read saved draft",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Profile completion 25%',()=>pm.expect(pm.response.json().completion.percentage).to.eql(25));pm.test('Owner metadata is private',()=>pm.expect(pm.response.json().profile.user).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile complete with zero income",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 22,\n  \"state\": \"Uttar Pradesh\",\n  \"district\": \"Muzaffarnagar\",\n  \"occupation\": \"student\",\n  \"annualHouseholdIncome\": 0\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Profile completion 100%',()=>pm.expect(pm.response.json().completion.percentage).to.eql(100));pm.test('Owner metadata is private',()=>pm.expect(pm.response.json().profile.user).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile rejects invalid age",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": -1,\n  \"state\": \"Uttar Pradesh\",\n  \"district\": \"Muzaffarnagar\",\n  \"occupation\": \"student\",\n  \"annualHouseholdIncome\": 0\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile rejects injected owner",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"age\": 22,\n  \"state\": \"Uttar Pradesh\",\n  \"district\": \"Muzaffarnagar\",\n  \"occupation\": \"student\",\n  \"annualHouseholdIncome\": 0,\n  \"userId\": \"untrusted-owner\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile read after invalid saves",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Profile completion 100%',()=>pm.expect(pm.response.json().completion.percentage).to.eql(100));pm.test('Owner metadata is private',()=>pm.expect(pm.response.json().profile.user).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile missing authentication",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/profile"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes public catalog",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Curated catalog is seeded',()=>pm.expect(pm.response.json().catalog.total).to.be.at.least(6));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes keyword search",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?q=farmer"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Farmer search finds PM-KISAN',()=>pm.expect(pm.response.json().schemes.some(s=>s.slug==='pm-kisan')).to.eql(true));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes combined filters",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?category=insurance&level=central&state=Delhi"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes state coverage",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?level=state&state=Uttar%20Pradesh"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes out-of-coverage view",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?level=state&state=Delhi"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Honest empty result',()=>pm.expect(pm.response.json().schemes).to.eql([]));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes pagination",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?limit=2&page=2"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheme official references",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes/pm-kisan"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Official sources present',()=>pm.expect(pm.response.json().scheme.sources.length).to.be.above(0));pm.test('No database metadata',()=>pm.expect(pm.response.json().scheme._id).to.eql(undefined));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Scheme missing slug",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes/not-in-catalog"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes invalid filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?category=unknown"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes excessive limit",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/schemes?limit=25"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Schemes read-only API",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/schemes",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Untrusted scheme\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 404',()=>pm.response.to.have.status(404));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening missing token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/eligibility"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening baseline missing facts",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Six reviewed entries',()=>pm.expect(pm.response.json().results.length).to.eql(6));pm.test('Additional answers not retained',()=>pm.expect(pm.response.json().counts.needs_info).to.eql(6));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening supplied basic match",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"pmsbyAccount\": true,\n    \"pmsbySingleAccount\": true,\n    \"premiumConsent\": true\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('PMSBY basic match',()=>pm.expect(pm.response.json().results.find(x=>x.slug==='pmsby').assessment.status).to.eql('basic_match'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening known failure",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"existingBankAccount\": true\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('PMJDY checked failure',()=>pm.expect(pm.response.json().results.find(x=>x.slug==='pm-jan-dhan-yojana').assessment.status).to.eql('criteria_not_met'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening not sure",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"existingBankAccount\": null\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening rejects string boolean",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"existingBankAccount\": \"false\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening rejects invalid stage",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {\n    \"upStage\": \"class-2\"\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening rejects profile override",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"answers\": {},\n  \"profile\": {\n    \"age\": 22\n  }\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Screening confirms answers are ephemeral",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/eligibility"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Answers are not persisted',()=>pm.expect(pm.response.json().counts.needs_info).to.eql(6));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness missing token",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/readiness"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 401',()=>pm.response.to.have.status(401));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness initial previews",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness save scheme",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "const e=pm.response.json().entry;pm.collectionVariables.set('readinessRevision',e.revision);pm.collectionVariables.set('readinessSaveId',e.saveId);pm.collectionVariables.set('readinessVersion',e.templateVersion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness complete task",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"itemId\": \"account\",\n  \"completed\": true,\n  \"revision\": {{readinessRevision}},\n  \"saveId\": \"{{readinessSaveId}}\",\n  \"templateVersion\": \"{{readinessVersion}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "const e=pm.response.json().entry;pm.collectionVariables.set('readinessRevision',e.revision);pm.collectionVariables.set('readinessSaveId',e.saveId);pm.collectionVariables.set('readinessVersion',e.templateVersion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness read persisted task",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Task stored',()=>pm.expect(pm.response.json().entries.find(e=>e.slug==='pmsby').progress.completed).to.eql(1));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness rejects string completion",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"itemId\": \"account\",\n  \"completed\": \"true\",\n  \"revision\": {{readinessRevision}},\n  \"saveId\": \"{{readinessSaveId}}\",\n  \"templateVersion\": \"{{readinessVersion}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness repeated save preserves progress",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "const e=pm.response.json().entry;pm.collectionVariables.set('readinessRevision',e.revision);pm.collectionVariables.set('readinessSaveId',e.saveId);pm.collectionVariables.set('readinessVersion',e.templateVersion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness unmark task",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"itemId\": \"account\",\n  \"completed\": false,\n  \"revision\": {{readinessRevision}},\n  \"saveId\": \"{{readinessSaveId}}\",\n  \"templateVersion\": \"{{readinessVersion}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "const e=pm.response.json().entry;pm.collectionVariables.set('readinessRevision',e.revision);pm.collectionVariables.set('readinessSaveId',e.saveId);pm.collectionVariables.set('readinessVersion',e.templateVersion);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness rejects owner override",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"user\": \"another-account\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 400',()=>pm.response.to.have.status(400));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness rejects stale removal",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"revision\": 0,\n  \"saveId\": \"{{readinessSaveId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 409',()=>pm.response.to.have.status(409));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(false));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness remove saved scheme",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness/pmsby",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"revision\": {{readinessRevision}},\n  \"saveId\": \"{{readinessSaveId}}\"\n}"
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Readiness confirms removal",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{token}}"
+          }
+        ],
+        "url": "{{baseUrl}}/readiness"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('HTTP 200',()=>pm.response.to.have.status(200));",
+              "pm.test('Consistent response',()=>pm.expect(pm.response.json().success).to.eql(true));",
+              "pm.test('No password or stack exposed',()=>{const b=pm.response.json();pm.expect(b.stack).to.eql(undefined);if(b.user)pm.expect(b.user.password).to.eql(undefined);});",
+              "pm.test('Saved entry removed',()=>pm.expect(pm.response.json().entries.find(e=>e.slug==='pmsby').saved).to.eql(false));"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}
