@@ -1,6 +1,8 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useEffect, useRef } from "react";
 import Button from "./Button";
 export default function LeaveProfileDialog({ blocker, busy, dirty }) {
+  const { t } = useLanguage();
   const ref = useRef(null);
   useEffect(() => {
     const dialog = ref.current;
@@ -34,22 +36,26 @@ export default function LeaveProfileDialog({ blocker, busy, dirty }) {
       }}
     >
       <h2 id="leave-title">
-        {busy
-          ? "Your profile is being saved"
-          : dirty
-            ? "Leave without saving?"
-            : "Leave this page?"}
+        {t(
+          busy
+            ? "Your profile is being saved"
+            : dirty
+              ? "Leave without saving?"
+              : "Leave this page?",
+        )}
       </h2>
       <p id="leave-description">
-        {busy
-          ? "Wait for the save to finish before leaving this page."
-          : dirty
-            ? "Your unsaved changes will be lost if you leave this page."
-            : "Your profile has been saved. You can return to it anytime."}
+        {t(
+          busy
+            ? "Wait for the save to finish before leaving this page."
+            : dirty
+              ? "Your unsaved changes will be lost if you leave this page."
+              : "Your profile has been saved. You can return to it anytime.",
+        )}
       </p>
       <div>
         <Button type="button" onClick={() => blocker.reset()} autoFocus>
-          Keep editing
+          {t("Keep editing")}
         </Button>
         {!busy ? (
           <Button
@@ -57,7 +63,7 @@ export default function LeaveProfileDialog({ blocker, busy, dirty }) {
             variant="secondary"
             onClick={() => blocker.proceed()}
           >
-            Leave page
+            {t("Leave page")}
           </Button>
         ) : null}
       </div>

@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 export default function Field({
@@ -8,10 +9,11 @@ export default function Field({
   id,
   ...props
 }) {
+  const { t } = useLanguage();
   const [visible, setVisible] = useState(false);
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{t(label)}</label>
       <div className="input-wrap">
         <input
           id={id}
@@ -26,7 +28,7 @@ export default function Field({
           <button
             className="password-toggle"
             type="button"
-            aria-label={visible ? "Hide password" : "Show password"}
+            aria-label={t(visible ? "Hide password" : "Show password")}
             aria-pressed={visible}
             onClick={() => setVisible(!visible)}
           >
@@ -36,11 +38,11 @@ export default function Field({
       </div>
       {error ? (
         <p id={`${id}-error`} className="field-error">
-          {error}
+          {t(error)}
         </p>
       ) : helper ? (
         <p id={`${id}-helper`} className="field-helper">
-          {helper}
+          {t(helper)}
         </p>
       ) : null}
     </div>

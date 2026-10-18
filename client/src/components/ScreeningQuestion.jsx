@@ -1,5 +1,7 @@
+import { useLanguage } from "../i18n/useLanguage";
 import SelectField from "./SelectField";
 export default function ScreeningQuestion({ question, answers, onChange }) {
+  const { t } = useLanguage();
   const value = answers[question.key] ?? null;
   const stage = question.key === "upStageRequirementsMet" && answers.upStage;
   const id = `screen-${question.key}`;
@@ -8,34 +10,45 @@ export default function ScreeningQuestion({ question, answers, onChange }) {
       <div className="screening-stage">
         <SelectField
           id={id}
-          label={question.label}
+          label={t(question.label)}
           value={value || ""}
           options={question.options}
-          placeholder="Not selected / not sure"
+          placeholder={t("Not selected / not sure")}
           onChange={(event) =>
             onChange(question.key, event.target.value || null)
           }
-          helper={question.helper}
+          helper={t(question.helper)}
         />
         <a href={question.source.url} target="_blank" rel="noopener noreferrer">
-          Official stage requirements ↗
+          {t("Official stage requirements \u2197")}
         </a>
       </div>
     );
   return (
     <fieldset className="screening-question" aria-describedby={`${id}-helper`}>
-      <legend>{question.label}</legend>
-      <p id={`${id}-helper`}>{question.helper}</p>
+      <legend>{t(question.label)}</legend>
+      <p id={`${id}-helper`}>{t(question.helper)}</p>
       {stage && (
         <p className="screening-stage-context">
-          Read the selected stage’s requirement above before answering.
+          {t(
+            "Read the selected stage\u2019s requirement above before answering.",
+          )}
         </p>
       )}
       <div className="screening-choices">
         {[
-          { value: true, label: "Yes" },
-          { value: false, label: "No" },
-          { value: null, label: "Not sure" },
+          {
+            value: true,
+            label: "Yes",
+          },
+          {
+            value: false,
+            label: "No",
+          },
+          {
+            value: null,
+            label: "Not sure",
+          },
         ].map((option) => (
           <label
             key={String(option.value)}
@@ -48,7 +61,7 @@ export default function ScreeningQuestion({ question, answers, onChange }) {
               checked={value === option.value}
               onChange={() => onChange(question.key, option.value)}
             />
-            <span>{option.label}</span>
+            <span>{t(option.label)}</span>
           </label>
         ))}
       </div>
@@ -58,7 +71,7 @@ export default function ScreeningQuestion({ question, answers, onChange }) {
         rel="noopener noreferrer"
         className="question-source"
       >
-        Read the official requirement ↗
+        {t("Read the official requirement \u2197")}
       </a>
     </fieldset>
   );

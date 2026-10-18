@@ -1,8 +1,10 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import api, { errorMessage } from "../api/axios";
 import { useAuth } from "../context/AuthContext";
 export default function useReadiness() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [attempt, setAttempt] = useState(0);
   const [state, setState] = useState({
@@ -23,9 +25,16 @@ export default function useReadiness() {
     lock.current = false;
     setBusy("");
     setMutationError("");
-    setState({ owner: user.id, entries: [], loading: true, error: "" });
+    setState({
+      owner: user.id,
+      entries: [],
+      loading: true,
+      error: "",
+    });
     api
-      .get("/readiness", { signal: controller.signal })
+      .get("/readiness", {
+        signal: controller.signal,
+      })
       .then(({ data }) => {
         if (!controller.signal.aborted && run === generation.current)
           setState({
@@ -97,7 +106,7 @@ export default function useReadiness() {
           )
           .filter((row) => row.available || row.saved),
       }));
-      toast.success(message);
+      toast.success(t(message));
       return true;
     } catch (error) {
       if (controller.signal.aborted || run !== generation.current) return false;
@@ -106,7 +115,7 @@ export default function useReadiness() {
           ? "This checklist changed in another window. Reload saved schemes before making another change."
           : `${errorMessage(error)} Your last confirmed progress is still shown. Reload to confirm whether the update reached the server.`,
       );
-      toast.error("Readiness update could not be confirmed.");
+      toast.error(t("Readiness update could not be confirmed."));
       return false;
     } finally {
       if (run === generation.current) {
@@ -117,7 +126,9 @@ export default function useReadiness() {
             previousFocus?.isConnected &&
             document.activeElement === document.body
           )
-            previousFocus.focus({ preventScroll: true });
+            previousFocus.focus({
+              preventScroll: true,
+            });
         });
       }
     }
@@ -125,11 +136,23 @@ export default function useReadiness() {
   return {
     ...(state.owner === user.id
       ? state
-      : { entries: [], loading: true, error: "" }),
+      : {
+          entries: [],
+          loading: true,
+          error: "",
+        }),
     busy,
     mutationError,
     retry: () => {
-      if (!lock.current) setAttempt((n) => n + 1);
+      if (!lock.current) {
+        setState({
+          owner: user.id,
+          entries: [],
+          loading: true,
+          error: "",
+        });
+        setAttempt((n) => n + 1);
+      }
     },
     save: (entry) =>
       mutate(entry, "PUT", {}, "Scheme saved to your preparation list."),
@@ -152,7 +175,10 @@ export default function useReadiness() {
       mutate(
         entry,
         "DELETE",
-        { revision: entry.revision, saveId: entry.saveId },
+        {
+          revision: entry.revision,
+          saveId: entry.saveId,
+        },
         "Scheme and checklist progress removed from your saved list.",
       ),
   };

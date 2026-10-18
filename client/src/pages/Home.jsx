@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -44,36 +45,39 @@ const features = [
   },
 ];
 function Preview() {
+  const { t } = useLanguage();
   return (
     <div
       className="preview-scene"
-      aria-label="Conceptual preview of planned features"
+      aria-label={t("Conceptual preview of planned features")}
     >
       <div className="orbit orbit-one" />
       <div className="orbit orbit-two" />
       <div className="preview-card">
         <div className="preview-top">
           <span className="mini-brand">
-            <Landmark size={18} /> Your opportunity space
+            <Landmark size={18} />
+            {t(" Your opportunity space")}
           </span>
-          <span className="preview-label">CONCEPT PREVIEW</span>
+          <span className="preview-label">{t("CONCEPT PREVIEW")}</span>
         </div>
         <div className="preview-body">
-          <div className="preview-greeting">A clearer path forward</div>
+          <div className="preview-greeting">{t("A clearer path forward")}</div>
           <h2>
-            Smart scheme discovery<span>Built around you.</span>
+            {t("Smart scheme discovery")}
+            <span>{t("Built around you.")}</span>
           </h2>
           <div className="preview-search">
             <Search size={17} />
-            <span>Opportunities that fit your life</span>
+            <span>{t("Opportunities that fit your life")}</span>
           </div>
           <div className="preview-item">
             <span className="icon-box indigo">
               <UserRound size={20} />
             </span>
             <div>
-              <strong>Profile Match</strong>
-              <small>Your circumstances. Your possibilities.</small>
+              <strong>{t("Profile Match")}</strong>
+              <small>{t("Your circumstances. Your possibilities.")}</small>
             </div>
             <span className="preview-check">
               <Check size={15} />
@@ -84,8 +88,8 @@ function Preview() {
               <BookOpen size={20} />
             </span>
             <div>
-              <strong>Eligibility Insights</strong>
-              <small>Complex requirements, made clear.</small>
+              <strong>{t("Eligibility Insights")}</strong>
+              <small>{t("Complex requirements, made clear.")}</small>
             </div>
             <ChevronRight size={17} />
           </div>
@@ -94,22 +98,22 @@ function Preview() {
               <FileCheck2 size={20} />
             </span>
             <div>
-              <strong>Application Readiness</strong>
-              <small>Know your next step.</small>
+              <strong>{t("Application Readiness")}</strong>
+              <small>{t("Know your next step.")}</small>
             </div>
             <ChevronRight size={17} />
           </div>
           <div className="preview-ai">
             <Sparkles size={19} />
             <div>
-              <strong>A little assistance. A lot more clarity.</strong>
-              <small>Source-grounded AI assistance · planned</small>
+              <strong>{t("A little assistance. A lot more clarity.")}</strong>
+              <small>{t("Source-grounded AI assistance \xB7 planned")}</small>
             </div>
           </div>
         </div>
         <div className="preview-bottom">
-          <LockKeyhole size={12} /> Conceptual interface · features coming in
-          future phases
+          <LockKeyhole size={12} />
+          {t(" Conceptual interface \xB7 features coming in future phases")}
         </div>
       </div>
       <div className="floating-note">
@@ -117,17 +121,19 @@ function Preview() {
           <ShieldCheck size={22} />
         </span>
         <div>
-          <strong>Clarity you can trace.</strong>
-          <span>Official-source grounding, by design.</span>
+          <strong>{t("Clarity you can trace.")}</strong>
+          <span>{t("Official-source grounding, by design.")}</span>
         </div>
       </div>
       <div className="scene-caption">
-        <span /> A thoughtful foundation. An ambitious future.
+        <span />
+        {t(" A thoughtful foundation. An ambitious future.")}
       </div>
     </div>
   );
 }
 export default function Home() {
+  const { t } = useLanguage();
   useReveal();
   const { user } = useAuth();
   const destination = user ? "/dashboard" : "/register";
@@ -137,32 +143,38 @@ export default function Home() {
         <div className="container hero-grid">
           <div className="hero-copy">
             <div className="eyebrow-pill">
-              <span className="status-dot" /> PUBLIC BENEFITS. PERSONAL CLARITY.
+              <span className="status-dot" />
+              {t(" PUBLIC BENEFITS. PERSONAL CLARITY.")}
             </div>
             <h1>
-              Government benefits,
+              {t("Government benefits,")}
               <br />
-              <span>made understandable.</span>
+              <span>{t("made understandable.")}</span>
             </h1>
             <p className="hero-description">
-              Discover government schemes that may match your profile and
-              understand them in simple language.
+              {t(
+                "Discover government schemes that may match your profile and understand them in simple language.",
+              )}
             </p>
             <div className="hero-actions">
               <Button to={destination}>
-                Find My Schemes <ArrowRight size={18} />
+                {t("Find My Schemes ")}
+                <ArrowRight size={18} />
               </Button>
               <Button href="#how-it-works" variant="secondary">
-                Learn More <ArrowUpRight size={17} />
+                {t("Learn More ")}
+                <ArrowUpRight size={17} />
               </Button>
             </div>
             <p className="hero-footnote">
-              <ShieldCheck size={16} /> Your journey starts with a simple
-              account.
+              <ShieldCheck size={16} />
+              {t(" Your journey starts with a simple account.")}
             </p>
             <div className="phase-note">
-              <span>PHASE 05</span> Save schemes and prepare at your pace.
-              Official verification still applies.
+              <span>{t("PHASE 06")}</span>
+              {t(
+                " Save schemes and prepare at your pace. Official verification still applies.",
+              )}
             </div>
           </div>
           <Preview />
@@ -170,32 +182,39 @@ export default function Home() {
       </section>
       <div className="principles-strip">
         <div className="container principles-inner">
-          <span>DESIGNED WITH PURPOSE</span>
+          <span>{t("DESIGNED WITH PURPOSE")}</span>
           <p>
-            <Check size={16} /> Simple language
+            <Check size={16} />
+            {t(" Simple language")}
           </p>
           <p>
-            <Check size={16} /> Privacy in mind
+            <Check size={16} />
+            {t(" Privacy in mind")}
           </p>
           <p>
-            <Check size={16} /> Transparent by design
+            <Check size={16} />
+            {t(" Transparent by design")}
           </p>
           <p>
-            <Check size={16} /> Made for India
+            <Check size={16} />
+            {t(" Made for India")}
           </p>
         </div>
       </div>
       <section id="why" tabIndex={-1} className="section container">
         <div className="section-heading" data-reveal>
-          <span className="eyebrow">LESS COMPLEXITY. MORE POSSIBILITY.</span>
+          <span className="eyebrow">
+            {t("LESS COMPLEXITY. MORE POSSIBILITY.")}
+          </span>
           <h2>
-            Opportunities shouldn’t
+            {t("Opportunities shouldn\u2019t")}
             <br />
-            get lost in the paperwork.
+            {t("get lost in the paperwork.")}
           </h2>
           <p>
-            Finding support can feel complicated. We’re building a simpler way
-            to go from “Where do I start?” to “I understand my next step.”
+            {t(
+              "Finding support can feel complicated. We\u2019re building a simpler way to go from \u201CWhere do I start?\u201D to \u201CI understand my next step.\u201D",
+            )}
           </p>
         </div>
         <div className="feature-grid">
@@ -203,16 +222,18 @@ export default function Home() {
             <article
               className="feature-card"
               data-reveal
-              style={{ "--delay": `${i * 65}ms` }}
+              style={{
+                "--delay": `${i * 65}ms`,
+              }}
               key={title}
             >
               <span className={`icon-box ${color}`}>
                 <Icon size={23} />
               </span>
-              <h3>{title}</h3>
-              <p>{text}</p>
+              <h3>{t(title)}</h3>
+              <p>{t(text)}</p>
               <span className="feature-status">
-                {i !== 2 ? "Available now" : "Planned capability"}{" "}
+                {t(i !== 2 ? "Available now" : "Planned capability")}{" "}
                 <ArrowUpRight size={14} />
               </span>
             </article>
@@ -222,13 +243,14 @@ export default function Home() {
       <section id="how-it-works" tabIndex={-1} className="process-section">
         <div className="container">
           <div className="section-heading centered" data-reveal>
-            <span className="eyebrow">A SIMPLE PATH FORWARD</span>
-            <h2>From possibilities to a plan.</h2>
+            <span className="eyebrow">{t("A SIMPLE PATH FORWARD")}</span>
+            <h2>{t("From possibilities to a plan.")}</h2>
             <p>
-              Here’s how the platform will work as we grow.
+              {t("Here\u2019s how the platform will work as we grow.")}
               <br />
-              Today, browse schemes, save your profile and screen basic
-              criteria.
+              {t(
+                "Today, browse schemes, save your profile and screen basic criteria.",
+              )}
             </p>
           </div>
           <div className="steps">
@@ -254,11 +276,13 @@ export default function Home() {
                 className="step"
                 key={title}
                 data-reveal
-                style={{ "--delay": `${i * 65}ms` }}
+                style={{
+                  "--delay": `${i * 65}ms`,
+                }}
               >
-                <div className="step-number">0{i + 1}</div>
-                <h3>{title}</h3>
-                <p>{text}</p>
+                <div className="step-number">0{t(i + 1)}</div>
+                <h3>{t(title)}</h3>
+                <p>{t(text)}</p>
               </article>
             ))}
           </div>
@@ -266,15 +290,16 @@ export default function Home() {
       </section>
       <section className="benefits-section container" data-reveal>
         <div>
-          <span className="eyebrow">BUILT FOR REAL LIFE</span>
+          <span className="eyebrow">{t("BUILT FOR REAL LIFE")}</span>
           <h2>
-            Less searching.
+            {t("Less searching.")}
             <br />
-            More understanding.
+            {t("More understanding.")}
           </h2>
           <p>
-            A thoughtful companion for navigating public benefits, wherever you
-            are in your journey.
+            {t(
+              "A thoughtful companion for navigating public benefits, wherever you are in your journey.",
+            )}
           </p>
         </div>
         <div className="benefit-list">
@@ -297,8 +322,8 @@ export default function Home() {
                 <Check size={18} />
               </span>
               <div>
-                <h3>{title}</h3>
-                <p>{text}</p>
+                <h3>{t(title)}</h3>
+                <p>{t(text)}</p>
               </div>
             </div>
           ))}
@@ -314,40 +339,44 @@ export default function Home() {
           <ShieldCheck size={40} />
         </div>
         <div className="trust-copy">
-          <span className="eyebrow">TRUST IS THE STARTING POINT</span>
-          <h2>Built with privacy in mind.</h2>
+          <span className="eyebrow">{t("TRUST IS THE STARTING POINT")}</span>
+          <h2>{t("Built with privacy in mind.")}</h2>
           <p>
-            Create an account with your name, email, and password. You choose
-            which profile details to save. Future recommendations aim to be
-            transparent and grounded in official sources.
+            {t(
+              "Create an account with your name, email, and password. You choose which profile details to save. Future recommendations aim to be transparent and grounded in official sources.",
+            )}
           </p>
           <div className="trust-tags">
             <span>
-              <LockKeyhole size={14} /> Minimal data collection
+              <LockKeyhole size={14} />
+              {t(" Minimal data collection")}
             </span>
             <span>
-              <BookOpen size={14} /> Traceable information
+              <BookOpen size={14} />
+              {t(" Traceable information")}
             </span>
           </div>
         </div>
         <div className="trust-aside">
-          Your information.
-          <br />A thoughtful approach.
-          <small>Privacy starts with the basics.</small>
+          {t("Your information.")}
+          <br />
+          {t("A thoughtful approach.")}
+          <small>{t("Privacy starts with the basics.")}</small>
         </div>
       </section>
       <section className="cta-section container" data-reveal>
         <div>
-          <span className="eyebrow">YOUR NEXT CHAPTER STARTS HERE</span>
+          <span className="eyebrow">{t("YOUR NEXT CHAPTER STARTS HERE")}</span>
           <h2>
-            A little clarity can
+            {t("A little clarity can")}
             <br />
-            open new possibilities.
+            {t("open new possibilities.")}
           </h2>
-          <p>Create your account. Be ready for what comes next.</p>
+          <p>{t("Create your account. Be ready for what comes next.")}</p>
         </div>
         <Button to={destination}>
-          Get started with SarkariSaathi <ArrowRight size={18} />
+          {t("Get started with SarkariSaathi ")}
+          <ArrowRight size={18} />
         </Button>
         <div className="cta-decoration" aria-hidden="true" />
       </section>

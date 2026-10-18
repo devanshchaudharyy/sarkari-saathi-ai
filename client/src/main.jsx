@@ -6,11 +6,16 @@ import "@fontsource/manrope/latin-500.css";
 import "@fontsource/manrope/latin-600.css";
 import "@fontsource/manrope/latin-700.css";
 import "@fontsource/manrope/latin-800.css";
+import "@fontsource/noto-sans-devanagari/devanagari-400.css";
+import "@fontsource/noto-sans-devanagari/devanagari-500.css";
+import "@fontsource/noto-sans-devanagari/devanagari-600.css";
+import "@fontsource/noto-sans-devanagari/devanagari-700.css";
 import "./styles.css";
 import "./profile.css";
 import "./schemes.css";
 import "./eligibility.css";
 import "./readiness.css";
+import "./i18n.css";
 import { router } from "./App";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

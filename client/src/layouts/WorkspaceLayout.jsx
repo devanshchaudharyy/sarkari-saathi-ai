@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import {
   LayoutDashboard,
@@ -10,24 +11,31 @@ import {
   ListChecks,
 } from "lucide-react";
 import Brand from "../components/Brand";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import TranslationNotice from "../components/TranslationNotice";
 import Button from "../components/Button";
 import { useAuth } from "../context/AuthContext";
 export default function WorkspaceLayout() {
+  const { t } = useLanguage();
   const { user, logout } = useAuth();
   const location = useLocation();
   return (
     <div className="dashboard page-enter">
       <aside className="dashboard-sidebar workspace-sidebar">
         <Brand />
-        <span className="sidebar-label">YOUR WORKSPACE</span>
-        <nav className="workspace-navigation" aria-label="Workspace navigation">
+        <span className="sidebar-label">{t("YOUR WORKSPACE")}</span>
+        <nav
+          className="workspace-navigation"
+          aria-label={t("Workspace navigation")}
+        >
           <NavLink
             to="/dashboard"
             className={({ isActive }) =>
               isActive ? "sidebar-active" : "sidebar-link"
             }
           >
-            <LayoutDashboard size={19} /> Overview
+            <LayoutDashboard size={19} />
+            {t(" Overview")}
           </NavLink>
           <NavLink
             to="/profile"
@@ -35,10 +43,12 @@ export default function WorkspaceLayout() {
               isActive ? "sidebar-active" : "sidebar-link"
             }
           >
-            <UserRound size={19} /> My profile
+            <UserRound size={19} />
+            {t(" My profile")}
           </NavLink>
           <NavLink to="/schemes" className="sidebar-link">
-            <Compass size={19} /> Schemes
+            <Compass size={19} />
+            {t(" Schemes")}
           </NavLink>
           <NavLink
             to="/eligibility"
@@ -46,7 +56,8 @@ export default function WorkspaceLayout() {
               isActive ? "sidebar-active" : "sidebar-link"
             }
           >
-            <ListChecks size={19} /> Screening
+            <ListChecks size={19} />
+            {t(" Screening")}
           </NavLink>
           <NavLink
             to="/readiness"
@@ -55,46 +66,50 @@ export default function WorkspaceLayout() {
             }
           >
             <FileCheck2 size={19} />
-            Preparation
+            {t("Preparation")}
           </NavLink>
         </nav>
         <div className="sidebar-future">
-          <span>ON THE HORIZON</span>
+          <span>{t("ON THE HORIZON")}</span>
           {[[Sparkles, "AI Assistant"]].map(([Icon, title]) => (
             <div key={title}>
               <Icon size={18} />
-              {title}
-              <small>Later</small>
+              {t(title)}
+              <small>{t("Later")}</small>
             </div>
           ))}
         </div>
         <div className="sidebar-bottom">
           <div className="sidebar-trust">
             <ShieldCheck size={22} />
-            <strong>Your space. Your details.</strong>
-            <p>Only your signed-in account can access your profile.</p>
+            <strong>{t("Your space. Your details.")}</strong>
+            <p>{t("Only your signed-in account can access your profile.")}</p>
           </div>
           <Button variant="ghost" onClick={logout}>
-            <LogOut size={17} /> Sign out
+            <LogOut size={17} />
+            {t(" Sign out")}
           </Button>
         </div>
       </aside>
       <main id="main-content" tabIndex={-1} className="dashboard-main">
         <header className="dashboard-top">
           <span>
-            Workspace{" "}
+            {t("Workspace")}{" "}
             <span className="breadcrumb">
               /{" "}
-              {location.pathname === "/profile"
-                ? "My profile"
-                : location.pathname === "/eligibility"
-                  ? "Screening"
-                  : location.pathname === "/readiness"
-                    ? "Preparation"
-                    : "Overview"}
+              {t(
+                location.pathname === "/profile"
+                  ? "My profile"
+                  : location.pathname === "/eligibility"
+                    ? "Screening"
+                    : location.pathname === "/readiness"
+                      ? "Preparation"
+                      : "Overview",
+              )}
             </span>
           </span>
           <div className="dashboard-user">
+            <LanguageSwitcher />
             <span className="user-avatar">
               {user.name.charAt(0).toUpperCase()}
             </span>
@@ -102,7 +117,7 @@ export default function WorkspaceLayout() {
             <button
               className="mobile-logout"
               onClick={logout}
-              aria-label="Sign out"
+              aria-label={t("Sign out")}
             >
               <LogOut size={19} />
             </button>
@@ -110,9 +125,10 @@ export default function WorkspaceLayout() {
         </header>
         <div className="dashboard-content">
           <Outlet />
+          <TranslationNotice />
           <footer className="dashboard-footer">
-            Independent project. Not an official government service.
-            <span>SarkariSaathi AI · Phase 05</span>
+            {t("Independent project. Not an official government service.")}
+            <span>{t("SarkariSaathi AI \xB7 Phase 06")}</span>
           </footer>
         </div>
       </main>

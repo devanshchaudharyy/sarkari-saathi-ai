@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useEffect, useRef } from "react";
 import Button from "./Button";
 export default function RemoveSavedDialog({
@@ -6,6 +7,7 @@ export default function RemoveSavedDialog({
   onCancel,
   onConfirm,
 }) {
+  const { t } = useLanguage();
   const ref = useRef(null);
   const previousFocus = useRef(document.activeElement);
   function cancel() {
@@ -13,7 +15,9 @@ export default function RemoveSavedDialog({
     onCancel();
     requestAnimationFrame(() => {
       if (previousFocus.current?.isConnected)
-        previousFocus.current.focus({ preventScroll: true });
+        previousFocus.current.focus({
+          preventScroll: true,
+        });
     });
   }
   useEffect(() => {
@@ -47,10 +51,13 @@ export default function RemoveSavedDialog({
         }
       }}
     >
-      <h2 id="remove-title">Remove {entry.acronym} from your list?</h2>
+      <h2 id="remove-title">
+        {t("Remove {0} from your list?", [entry.acronym])}
+      </h2>
       <p id="remove-description">
-        This removes this scheme’s saved checklist progress. You can save the
-        scheme again and start with an empty checklist.
+        {t(
+          "This removes this scheme\u2019s saved checklist progress. You can save the scheme again and start with an empty checklist.",
+        )}
       </p>
       <div>
         <Button
@@ -60,7 +67,7 @@ export default function RemoveSavedDialog({
           disabled={busy}
           onClick={cancel}
         >
-          Keep scheme
+          {t("Keep scheme")}
         </Button>
         <Button
           type="button"
@@ -68,7 +75,7 @@ export default function RemoveSavedDialog({
           loading={busy}
           onClick={onConfirm}
         >
-          Remove saved scheme
+          {t("Remove saved scheme")}
         </Button>
       </div>
     </dialog>

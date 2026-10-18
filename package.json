@@ -9,14 +9,17 @@
   "scripts": {
     "dev": "concurrently -k -n api,web \"npm run dev -w server\" \"npm run dev -w client\"",
     "build": "npm run build -w client",
-    "test": "npm run test -w server",
+    "test": "npm run test -w server && npm run test:i18n",
+    "test:i18n": "node --test tests/i18n.test.mjs",
     "test:browser": "node tests/browser.mjs",
     "test:profile-browser": "node tests/profile-browser.mjs",
     "test:schemes-browser": "node tests/schemes-browser.mjs",
     "test:eligibility-browser": "node tests/eligibility-browser.mjs",
     "test:readiness-browser": "node tests/readiness-browser.mjs",
+    "test:language-browser": "node tests/language-browser.mjs",
     "audit:phase4": "node scripts/audit-phase4.mjs",
     "audit:phase5": "node scripts/audit-phase5.mjs",
+    "audit:phase6": "node scripts/audit-phase6.mjs",
     "screenshots": "node scripts/capture-screenshots.mjs",
     "seed:schemes": "npm run seed:schemes -w server"
   },

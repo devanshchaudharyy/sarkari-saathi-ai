@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import {
   ArrowUpRight,
   MapPin,
@@ -18,6 +19,7 @@ export const schemeIcons = {
   "women-education": GraduationCap,
 };
 export default function SchemeCard({ scheme, search = "" }) {
+  const { t, locale } = useLanguage();
   const Icon = schemeIcons[scheme.category] || BookOpen;
   return (
     <article className={`scheme-card scheme-${scheme.category}`}>
@@ -26,29 +28,37 @@ export default function SchemeCard({ scheme, search = "" }) {
           <Icon size={24} aria-hidden="true" />
         </span>
         <span className="badge">
-          {scheme.level === "central" ? "Central scheme" : "State scheme"}
+          {t(scheme.level === "central" ? "Central scheme" : "State scheme")}
         </span>
       </div>
       <span className="scheme-category">
-        {categoryLabel(scheme.category)} · {scheme.acronym}
+        {t(categoryLabel(scheme.category))} · {t(scheme.acronym)}
       </span>
-      <h2>{scheme.name}</h2>
-      <p className="scheme-summary">{scheme.summary}</p>
+      <h2>{t(scheme.name)}</h2>
+      <p className="scheme-summary">{t(scheme.summary)}</p>
       <div className="scheme-benefit">
-        <strong>{scheme.benefitLabel}</strong>
-        <span>{scheme.benefitNote}</span>
+        <strong>{t(scheme.benefitLabel)}</strong>
+        <span>{t(scheme.benefitNote)}</span>
       </div>
       <div className="scheme-geography">
         <MapPin size={14} aria-hidden="true" />{" "}
-        {scheme.level === "central" ? "Across India" : scheme.states.join(", ")}
+        {t(
+          scheme.level === "central"
+            ? "Across India"
+            : scheme.states.join(", "),
+        )}
       </div>
       <div className="scheme-card-footer">
-        <small>Reviewed {formatReviewDate(scheme.reviewedAt)}</small>
+        <small>
+          {t("Reviewed ")}
+          {t(formatReviewDate(scheme.reviewedAt, locale))}
+        </small>
         <Link
           to={`/schemes/${scheme.slug}${search}`}
-          aria-label={`View details: ${scheme.name}`}
+          aria-label={t(`View details: ${scheme.name}`)}
         >
-          View details <ArrowUpRight size={17} aria-hidden="true" />
+          {t("View details ")}
+          <ArrowUpRight size={17} aria-hidden="true" />
         </Link>
       </div>
     </article>

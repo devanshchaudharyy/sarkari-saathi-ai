@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
@@ -19,46 +20,49 @@ import ScreeningQuestion from "../components/ScreeningQuestion";
 import { useAuth } from "../context/AuthContext";
 import { SCREENING_STATUSES } from "../../../shared/eligibility";
 export default function Eligibility() {
+  const { t } = useLanguage();
   const resource = useEligibility();
   const { user } = useAuth();
   return (
     <div className="eligibility-page page-enter">
       <header className="screening-heading">
         <span className="eyebrow">
-          <ListChecks size={15} aria-hidden="true" /> CLARITY, ONE REQUIREMENT
-          AT A TIME
+          <ListChecks size={15} aria-hidden="true" />
+          {t(" CLARITY, ONE REQUIREMENT AT A TIME")}
         </span>
         <h1>
-          A clearer view of
+          {t("A clearer view of")}
           <br />
-          <span>where you stand.</span>
+          <span>{t("where you stand.")}</span>
         </h1>
         <p>
-          Check basic scheme requirements against your saved details.
-          <br className="desktop-break" /> See what matches, what’s missing, and
-          what to verify next.
+          {t("Check basic scheme requirements against your saved details.")}
+          <br className="desktop-break" />
+          {t(
+            " See what matches, what\u2019s missing, and what to verify next.",
+          )}
         </p>
       </header>
       <div className="screening-notice">
         <Info size={20} aria-hidden="true" />
         <p>
-          For new applications. This is partial screening, not an official
-          eligibility decision or approval. Your details are self-reported;
-          other conditions and provider verification still apply.
+          {t(
+            "For new applications. This is partial screening, not an official eligibility decision or approval. Your details are self-reported; other conditions and provider verification still apply.",
+          )}
         </p>
       </div>
       {resource.loading ? (
         <div className="screening-loading" role="status">
           <ListChecks size={25} aria-hidden="true" />
-          <span>Preparing your screening workspace</span>
+          <span>{t("Preparing your screening workspace")}</span>
           <div className="skeleton-line" />
           <div className="skeleton-line short" />
         </div>
       ) : resource.error ? (
         <div className="profile-load-error" role="alert">
-          <h2>We couldn’t prepare your screening</h2>
-          <p>{resource.error}</p>
-          <Button onClick={resource.retry}>Try again</Button>
+          <h2>{t("We couldn\u2019t prepare your screening")}</h2>
+          <p>{t(resource.error)}</p>
+          <Button onClick={resource.retry}>{t("Try again")}</Button>
         </div>
       ) : (
         <EligibilityForm
@@ -71,6 +75,7 @@ export default function Eligibility() {
   );
 }
 function EligibilityForm({ initial, reload }) {
+  const { t, locale } = useLanguage();
   const [params, setParams] = useSearchParams();
   const [answers, setAnswers] = useState({});
   const [report, setReport] = useState(initial);
@@ -104,7 +109,11 @@ function EligibilityForm({ initial, reload }) {
     setAnswers((current) => ({
       ...current,
       [key]: value,
-      ...(key === "upStage" ? { upStageRequirementsMet: null } : {}),
+      ...(key === "upStage"
+        ? {
+            upStageRequirementsMet: null,
+          }
+        : {}),
     }));
     setError("");
   }
@@ -115,7 +124,9 @@ function EligibilityForm({ initial, reload }) {
         : "smooth",
       block: "start",
     });
-    ref.current?.focus({ preventScroll: true });
+    ref.current?.focus({
+      preventScroll: true,
+    });
   }
   async function check(event) {
     event.preventDefault();
@@ -125,7 +136,11 @@ function EligibilityForm({ initial, reload }) {
     controller.current?.abort();
     const requestController = new AbortController();
     controller.current = requestController;
-    const payload = { answers: { ...answers } };
+    const payload = {
+      answers: {
+        ...answers,
+      },
+    };
     try {
       const { data } = await api.post("/eligibility", payload, {
         signal: requestController.signal,
@@ -134,13 +149,13 @@ function EligibilityForm({ initial, reload }) {
       setReport(data);
       setSubmitted(JSON.stringify(payload.answers));
       toast.success(
-        "Screening updated. Review the reasons and remaining conditions.",
+        t("Screening updated. Review the reasons and remaining conditions."),
       );
       requestAnimationFrame(() => focusSection(resultsHeading));
     } catch (error) {
       if (requestController.signal.aborted) return;
       setError(`${errorMessage(error)} Your answers are still here.`);
-      toast.error("Screening could not be updated.");
+      toast.error(t("Screening could not be updated."));
     } finally {
       if (!requestController.signal.aborted) setBusy(false);
     }
@@ -153,44 +168,48 @@ function EligibilityForm({ initial, reload }) {
     <>
       <section
         className="screening-profile"
-        aria-label="Saved profile used for screening"
+        aria-label={t("Saved profile used for screening")}
       >
         <div className="screening-profile-title">
           <UserRound size={19} aria-hidden="true" />
           <div>
-            <strong>Your saved starting details</strong>
+            <strong>{t("Your saved starting details")}</strong>
             <span>
-              {report.profile.updatedAt
-                ? "Snapshot used for the last screen"
-                : "No profile saved yet"}
+              {t(
+                report.profile.updatedAt
+                  ? "Snapshot used for the last screen"
+                  : "No profile saved yet",
+              )}
             </span>
           </div>
         </div>
         <dl>
           <div>
-            <dt>Your age</dt>
-            <dd>{report.profile.age ?? "Not added"}</dd>
+            <dt>{t("Your age")}</dt>
+            <dd>{t(report.profile.age ?? "Not added")}</dd>
           </div>
           <div>
-            <dt>State / UT</dt>
-            <dd>{report.profile.state || "Not added"}</dd>
+            <dt>{t("State / UT")}</dt>
+            <dd>{t(report.profile.state || "Not added")}</dd>
           </div>
           <div>
-            <dt>Household income / year</dt>
+            <dt>{t("Household income / year")}</dt>
             <dd>
-              {report.profile.annualHouseholdIncome === null
-                ? "Not added"
-                : `₹${report.profile.annualHouseholdIncome.toLocaleString("en-IN")}`}
+              {t(
+                report.profile.annualHouseholdIncome === null
+                  ? "Not added"
+                  : `₹${report.profile.annualHouseholdIncome.toLocaleString(locale)}`,
+              )}
             </dd>
           </div>
         </dl>
         <div className="screening-profile-actions">
           <Button to="/profile" variant="ghost">
-            {missingProfile ? "Add profile details" : "Edit profile"}{" "}
+            {t(missingProfile ? "Add profile details" : "Edit profile")}{" "}
             <ArrowRight size={14} aria-hidden="true" />
           </Button>
           <button onClick={reload} disabled={busy}>
-            Reload saved details (resets answers)
+            {t("Reload saved details (resets answers)")}
           </button>
         </div>
       </section>
@@ -198,37 +217,38 @@ function EligibilityForm({ initial, reload }) {
         <form
           onSubmit={check}
           className="screening-form"
-          aria-label="Scheme screening answers"
+          aria-label={t("Scheme screening answers")}
         >
           <div className="screening-form-top">
-            <span className="eyebrow">01 / FILL THE GAPS</span>
+            <span className="eyebrow">{t("01 / FILL THE GAPS")}</span>
             <h2 ref={questionsHeading} tabIndex={-1}>
-              A few facts your profile can’t tell us.
+              {t("A few facts your profile can\u2019t tell us.")}
             </h2>
-            <p>Answer only what you know. Not sure is a valid answer.</p>
-            <label htmlFor="screening-scheme">Choose a scheme</label>
+            <p>{t("Answer only what you know. Not sure is a valid answer.")}</p>
+            <label htmlFor="screening-scheme">{t("Choose a scheme")}</label>
             <select
               id="screening-scheme"
               value={selected}
               onChange={(event) => chooseScheme(event.target.value)}
               disabled={busy}
             >
-              <option value="all">All schemes in this catalog</option>
+              <option value="all">{t("All schemes in this catalog")}</option>
               {report.results.map((result) => (
                 <option key={result.slug} value={result.slug}>
-                  {result.acronym} · {result.name}
+                  {t(result.acronym)} · {t(result.name)}
                 </option>
               ))}
             </select>
             {requested && selected === "all" && (
               <p className="screening-view-hint">
-                That scheme isn’t in the loaded catalog. Showing the full
-                collection.
+                {t(
+                  "That scheme isn\u2019t in the loaded catalog. Showing the full collection.",
+                )}
               </p>
             )}
           </div>
           <fieldset className="screening-fields" disabled={busy}>
-            <legend className="sr-only">Additional scheme facts</legend>
+            <legend className="sr-only">{t("Additional scheme facts")}</legend>
             {groups.map((group) => (
               <details
                 className="question-group"
@@ -237,13 +257,13 @@ function EligibilityForm({ initial, reload }) {
               >
                 <summary>
                   <span>
-                    {group}
+                    {t(group)}
                     <small>
-                      {
+                      {t(
                         questions.filter((question) => question.group === group)
-                          .length
-                      }{" "}
-                      questions
+                          .length,
+                      )}{" "}
+                      {t("questions")}
                     </small>
                   </span>
                   <ChevronDown size={17} aria-hidden="true" />
@@ -260,11 +280,11 @@ function EligibilityForm({ initial, reload }) {
                         />
                         {question.type === "stage" && answers.upStage && (
                           <p className="stage-requirement" role="note">
-                            {
+                            {t(
                               question.options.find(
                                 (stage) => stage.value === answers.upStage,
-                              )?.requirement
-                            }
+                              )?.requirement,
+                            )}
                           </p>
                         )}
                       </div>
@@ -275,12 +295,12 @@ function EligibilityForm({ initial, reload }) {
           </fieldset>
           {error && (
             <div role="alert" className="screening-error">
-              {error}
+              {t(error)}
             </div>
           )}
           <div className="screening-submit">
             <Button type="submit" loading={busy}>
-              {busy ? "Checking…" : "Run screening"}
+              {t(busy ? "Checking…" : "Run screening")}
               <ArrowRight size={16} aria-hidden="true" />
             </Button>
             <Button
@@ -292,13 +312,15 @@ function EligibilityForm({ initial, reload }) {
                 setError("");
               }}
             >
-              Reset answers <RotateCcw size={14} aria-hidden="true" />
+              {t("Reset answers ")}
+              <RotateCcw size={14} aria-hidden="true" />
             </Button>
           </div>
           <p className="screening-ephemeral">
-            <ShieldCheck size={15} aria-hidden="true" /> Additional answers are
-            sent for this check but aren’t saved to your account or browser
-            storage. They reset when you leave or refresh.
+            <ShieldCheck size={15} aria-hidden="true" />
+            {t(
+              " Additional answers are sent for this check but aren\u2019t saved to your account or browser storage. They reset when you leave or refresh.",
+            )}
           </p>
         </form>
         <aside className="screening-guide">
@@ -306,9 +328,9 @@ function EligibilityForm({ initial, reload }) {
             <ListChecks size={23} aria-hidden="true" />
           </span>
           <h2>
-            Understand the result,
+            {t("Understand the result,")}
             <br />
-            not just the label.
+            {t("not just the label.")}
           </h2>
           <ul>
             {Object.entries(SCREENING_STATUSES)
@@ -317,8 +339,8 @@ function EligibilityForm({ initial, reload }) {
                 <li key={key} className={`guide-${key}`}>
                   <span className="guide-dot" />
                   <div>
-                    <strong>{status.label}</strong>
-                    <p>{status.description}</p>
+                    <strong>{t(status.label)}</strong>
+                    <p>{t(status.description)}</p>
                   </div>
                 </li>
               ))}
@@ -326,39 +348,43 @@ function EligibilityForm({ initial, reload }) {
           <div className="screening-guide-note">
             <Info size={17} aria-hidden="true" />
             <p>
-              We don’t infer citizenship, tax status, land ownership or a girl’s
-              circumstances from your age, income or occupation. Official
-              sources sit behind each checked requirement.
+              {t(
+                "We don\u2019t infer citizenship, tax status, land ownership or a girl\u2019s circumstances from your age, income or occupation. Official sources sit behind each checked requirement.",
+              )}
             </p>
           </div>
         </aside>
       </div>
-      <section className="screening-results" aria-label="Screening results">
+      <section
+        className="screening-results"
+        aria-label={t("Screening results")}
+      >
         <div className="screening-results-heading">
           <div>
-            <span className="eyebrow">02 / SEE THE REASONS</span>
+            <span className="eyebrow">{t("02 / SEE THE REASONS")}</span>
             <h2 ref={resultsHeading} tabIndex={-1}>
-              Your screening overview
+              {t("Your screening overview")}
             </h2>
           </div>
           <span>
-            {results.length} {results.length === 1 ? "scheme" : "schemes"} ·
-            Alphabetical order
+            {t(results.length)} {t(results.length === 1 ? "scheme" : "schemes")}
+            {t(" \xB7 Alphabetical order")}
           </span>
         </div>
         {busy ? (
           <div className="screening-loading" role="status">
-            <span>Checking saved details and your answers</span>
+            <span>{t("Checking saved details and your answers")}</span>
             <div className="skeleton-line" />
           </div>
         ) : dirty ? (
           <div className="screening-stale" role="status">
             <RotateCcw size={23} aria-hidden="true" />
             <div>
-              <h3>Your answers changed.</h3>
+              <h3>{t("Your answers changed.")}</h3>
               <p>
-                Run screening to update the results. Previous results are hidden
-                so they aren’t mistaken for the current answers.
+                {t(
+                  "Run screening to update the results. Previous results are hidden so they aren\u2019t mistaken for the current answers.",
+                )}
               </p>
             </div>
           </div>
@@ -374,22 +400,23 @@ function EligibilityForm({ initial, reload }) {
                 .map(([key, status]) => (
                   <div className={`count-${key}`} key={key}>
                     <strong>
-                      {
+                      {t(
                         results.filter(
                           (result) => result.assessment.status === key,
-                        ).length
-                      }
+                        ).length,
+                      )}
                     </strong>
-                    <span>{status.label}</span>
+                    <span>{t(status.label)}</span>
                   </div>
                 ))}
             </div>
             {results.length === 0 ? (
               <div className="catalog-empty">
-                <h3>No catalog entries to screen yet.</h3>
+                <h3>{t("No catalog entries to screen yet.")}</h3>
                 <p>
-                  The scheme library needs to be loaded before screening is
-                  available.
+                  {t(
+                    "The scheme library needs to be loaded before screening is available.",
+                  )}
                 </p>
               </div>
             ) : (
@@ -400,22 +427,24 @@ function EligibilityForm({ initial, reload }) {
                     result={result}
                     onQuestions={(slug) => {
                       chooseScheme(slug);
-                      requestAnimationFrame(() =>
-                        focusSection(questionsHeading),
-                      );
+                      focusSection(questionsHeading);
                     }}
                   />
                 ))}
               </div>
             )}
             <p className="screening-check-stamp">
-              <Check size={14} aria-hidden="true" /> Checked{" "}
-              {new Intl.DateTimeFormat("en-IN", {
-                dateStyle: "medium",
-                timeStyle: "short",
-                timeZone: "Asia/Kolkata",
-              }).format(new Date(report.checkedAt))}{" "}
-              IST · Rule version {report.ruleVersion}
+              <Check size={14} aria-hidden="true" />
+              {t(" Checked")}{" "}
+              {t(
+                new Intl.DateTimeFormat(locale, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                  timeZone: "Asia/Kolkata",
+                }).format(new Date(report.checkedAt)),
+              )}{" "}
+              {t("IST \xB7 Rule version ")}
+              {t(report.ruleVersion)}
             </p>
           </>
         )}

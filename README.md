@@ -1,6 +1,6 @@
-# SarkariSaathi AI — Phases 1–5
+# SarkariSaathi AI — Phases 1–6
 
-A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. This is an independent project, not an official government service.
+A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. Phase 6 adds Hindi/English support across those features. AI assistance remains skipped. This is an independent project, not an official government service.
 
 ## Screenshots
 
@@ -8,7 +8,19 @@ A MERN application for understanding government schemes. Phase 1 provides authen
 
 ![Private saved schemes and preparation checklists](docs/screenshots/readiness-desktop.png)
 
-See the [desktop and mobile screenshot gallery](docs/screenshots/README.md) for all nine pages. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate them.
+See the [English and Hindi desktop/mobile screenshot gallery](docs/screenshots/README.md) for all nine pages. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate English images; set `SCREENSHOT_LANGUAGE=hi` for Hindi.
+
+## Phase 6: Hindi / English
+
+Use the language control in public navigation, authentication pages or the signed-in workspace. English is the default; Hindi applies to the landing page, forms and validation, dashboard, profile choices, all six scheme details, screening questions/reasons and preparation tasks. User names, emails, typed district values, identity fields, official links and canonical API identifiers remain unchanged. Hindi is a project translation, not an official government translation; provider sources and current terms remain authoritative. This phase translates the existing reviewed content, with its original review dates, rather than conducting a fresh scheme-policy review.
+
+Switching language updates the document language, page title, description, date formatting, labels, accessibility text and new notifications. It preserves route/query/hash, unsaved form edits, passwords, current screening answers and saved checklist progress. The preference is local to the browser (`sarkarisaathi.language.v1`); it is not a citizen-profile field and does not add any API calls or database fields. Other open tabs synchronize. Blocked storage still allows switching in memory; unsupported preferences fall back to English. Authentication behavior remains independent of language.
+
+The switcher supports keyboard arrows, Home/End, Enter/Space, Escape, outside click/focus, a selected state and focus restoration. Its visible language is included in the accessible name. Self-hosted Noto Sans Devanagari complements Manrope, with adjusted Hindi line height and mobile navigation spacing. Hindi text is a separate lazy-loaded chunk, fetched only when needed. A load failure keeps English usable and offers a reload instruction. Unknown future editorial or technical messages fall back to their original English; no external translation API or AI is used.
+
+Catalog filters display Hindi while retaining canonical values such as `Uttar Pradesh`, `student` and `insurance`. Search recognizes the reviewed schemes' listed Hindi names/common aliases (for example `किसान`, `पेंशन`, `कन्या`) while preserving the typed query in the URL. Other queries keep the original literal English-catalog search semantics. Sorting stays by the original English name and is labelled accordingly in Hindi; this is not a relevance ranking.
+
+See [localization architecture and maintenance](docs/I18N.md) and [Phase 6 verification](docs/PHASE6-VERIFICATION.md). New pieces: `LanguageSwitcher`, `TranslationNotice`, `useLanguage`, the translation core/dictionary and `i18n.css`. No new backend endpoint, migration, environment variable, AI service or deployment is required. API contracts and the 55-request Postman collection remain unchanged.
 
 ## Phase 5: application readiness
 
@@ -166,6 +178,8 @@ sarkari-saathi-ai/
       schemes.css
       eligibility.css
       readiness.css
+      i18n.css
+      i18n/         # core.js, useLanguage.js, lazy-loaded hi.json
     .env.example
     index.html
     vite.config.js
@@ -193,6 +207,8 @@ sarkari-saathi-ai/
   scripts/create-postman.mjs
   scripts/audit-phase4.mjs
   scripts/audit-phase5.mjs
+  scripts/audit-phase6.mjs
+  scripts/capture-screenshots.mjs
   docs/
     SarkariSaathi.postman_collection.json
     VERIFICATION.md
@@ -203,6 +219,9 @@ sarkari-saathi-ai/
     PHASE4-VERIFICATION.md
     READINESS-SOURCES.md
     PHASE5-VERIFICATION.md
+    I18N.md
+    PHASE6-VERIFICATION.md
+    screenshots/    # Nine pages, English/Hindi, desktop/mobile
   package.json
   package-lock.json
   .gitignore
@@ -212,7 +231,7 @@ User records contain name, normalized email, bcrypt password hash, and timestamp
 
 ## Packages and rationale
 
-Frontend: React/React DOM for UI, Vite and its React plugin for development/build, React Router for routing, Tailwind CSS and its Vite plugin for utilities, Axios for centralized requests, Lucide React for consistent tree-shaken icons, Sonner for accessible notifications, and Fontsource Manrope for self-hosted fonts. Custom CSS supplies shared tokens, responsive layouts, and lightweight motion; no animation library is needed.
+Frontend: React/React DOM for UI, Vite and its React plugin for development/build, React Router for routing, Tailwind CSS and its Vite plugin for utilities, Axios for centralized requests, Lucide React for consistent tree-shaken icons, Sonner for accessible notifications, and Fontsource Manrope/Noto Sans Devanagari for self-hosted Latin/Hindi fonts. Custom CSS supplies shared tokens, responsive layouts, and lightweight motion; no animation or runtime translation library is needed.
 
 Backend: Express 5 for asynchronous HTTP handlers, Mongoose for MongoDB models, bcrypt for password hashing, jsonwebtoken for HS256 bearer sessions, dotenv for local configuration, Zod for validation, Helmet for HTTP security headers, cors for an explicit origin allowlist, and express-rate-limit for authentication and protected mutation throttling.
 
@@ -233,7 +252,7 @@ Names are trimmed and must contain 2–80 characters. Email is trimmed, lowercas
 
 ## Design system and reusable UI
 
-Colors: ink `#172139`, muted text `#627087`, primary indigo `#5046dd`, off-white canvas, light slate borders, and restrained saffron/green feature accents. Manrope supplies the type hierarchy. Cards use 12–16px radii; controls use 8px radii, consistent heights, subtle shadows, and clear focus states.
+Colors: ink `#172139`, muted text `#627087`, primary indigo `#5046dd`, off-white canvas, light slate borders, and restrained saffron/green feature accents. Manrope supplies Latin typography, complemented by Noto Sans Devanagari and adjusted line heights for Hindi. Cards use 12–16px radii; controls use 8px radii, consistent heights, subtle shadows, and clear focus states.
 
 Reusable components: Brand; Button (primary, secondary, ghost, danger, loading and disabled states); Field (label, helper/error feedback and password visibility); Loader with skeleton lines; Navbar with mobile menu; Footer; ProtectedRoute; AuthPage; MainLayout. Shared classes provide icon boxes, badges, feature/dashboard cards, section headings, and reveal behavior. AuthProvider supplies user, token, loading, login, register, logout, sessionError, and retry.
 
@@ -249,19 +268,21 @@ npm run test:profile-browser
 npm run test:schemes-browser
 npm run test:eligibility-browser
 npm run test:readiness-browser
+npm run test:language-browser
 # Production frontend build and running API/preview required:
-npm run audit:phase5
+npm run audit:phase6
 ```
 
-Backend suites create and remove their own uniquely named test databases, with separate names for auth, profile, scheme, screening and readiness tests. They do not wipe the development database. Browser tests create uniquely named synthetic accounts, profiles and saved schemes in the development database; these remain available for inspection. Browser tests use installed Edge or Chrome; set `BROWSER_PATH` for another Chromium executable. The Phase 5 audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and a persistent browser profile in ignored `reports/`, and preserves storage to reach the private page. Results include authenticated preparation and public detail mobile audits.
+`npm test` runs the 170 API/domain tests and 23 translation/coverage tests; `npm run test:i18n` runs only localization tests. Backend suites create and remove their own uniquely named test databases, with separate names for auth, profile, scheme, screening and readiness tests. They do not wipe the development database. Browser tests create uniquely named synthetic accounts, profiles and saved schemes in the development database; these remain available for inspection. Browser tests use installed Edge or Chrome; set `BROWSER_PATH` for another Chromium executable. The Phase 6 audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and a persistent browser profile in ignored `reports/`, and preserves storage to reach the private page. It measures English/Hindi landing pages and Hindi preparation. Run Lighthouse separately from browser suites to avoid competing for CPU.
 
 Import `docs/SarkariSaathi.postman_collection.json` into Postman. Run the 55 requests in order; Health initializes a unique account email, registration/login capture the token, and readiness mutations capture the returned revision/save ID. Assertions check status/error safety. It creates a synthetic account in the configured API database. All request scripts and substituted JSON parse; equivalent HTTP scenarios run through Supertest. Postman desktop itself was not run. Expired-token and production-error scenarios are covered by the automated backend suite.
 
-See [Phase 5 verification](docs/PHASE5-VERIFICATION.md) for current results and API, browser, responsive, animation and security checklists. Earlier verification records are retained. The current run passed **170 backend/rule tests and 87 browser scenarios**; build succeeded. Measured mobile Lighthouse preparation: **100 performance/100 accessibility/100 best practices/63 SEO** (private route deliberately excluded from crawling); public detail: **100/100/100/100**. These are local audit observations, not a production or real-user performance guarantee.
+See [Phase 6 verification](docs/PHASE6-VERIFICATION.md) for current API, localization, browser, responsive, animation and security results, including measured Lighthouse scores and limitations. Earlier verification records are retained. Local audit observations are not a production or real-user performance guarantee.
 
 ## Current boundaries and known limitations
 
-- English only; no deployment is included. Hosting later requires SPA route fallback, HTTPS, appropriate origins, and production environment configuration.
+- English and Hindi are available; no deployment is included. Hosting later requires SPA route fallback, HTTPS, appropriate origins, and production environment configuration.
+- Hindi text is project-maintained, not an official or independently certified translation. New/unmapped catalog content and unexpected technical messages fall back to English. Hindi search aliases cover the six reviewed schemes, not unrestricted Hindi semantic search. External official pages may offer different languages or be temporarily unavailable.
 - Bearer tokens are stored in localStorage as requested; an XSS vulnerability could expose them. Logout removes the browser token but does not revoke it server-side before expiry. Cookie sessions, refresh tokens, and server revocation are future hardening work.
 - Rate limits are held in process memory and reset on restart; a shared store is needed when scaling to multiple instances. No reverse-proxy trust setting is enabled by default.
 - Profile drafts save only when explicitly submitted. Unsaved changes can be lost if the user chooses to discard them or signs out; there is no offline persistence or autosave. Concurrent saves use the last successful write.

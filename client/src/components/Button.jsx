@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { Link } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 export default function Button({
@@ -9,17 +10,18 @@ export default function Button({
   className = "",
   ...props
 }) {
+  const { t } = useLanguage();
   const classes = `button button-${variant} ${className}`;
   if (to)
     return (
       <Link className={classes} to={to} {...props}>
-        {children}
+        {t(children)}
       </Link>
     );
   if (href)
     return (
       <a className={classes} href={href} {...props}>
-        {children}
+        {t(children)}
       </a>
     );
   return (
@@ -30,7 +32,7 @@ export default function Button({
       aria-busy={loading}
     >
       {loading ? <LoaderCircle className="spin" size={18} /> : null}
-      {children}
+      {t(children)}
     </button>
   );
 }

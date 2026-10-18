@@ -12,8 +12,8 @@ export const SCHEME_LEVELS = [
 export const categoryLabel = (value) =>
   SCHEME_CATEGORIES.find((category) => category.value === value)?.label ||
   value;
-export const formatReviewDate = (date) =>
-  new Intl.DateTimeFormat("en-IN", {
+export const formatReviewDate = (date, locale = "en-IN") =>
+  new Intl.DateTimeFormat(locale, {
     day: "numeric",
     month: "short",
     year: "numeric",

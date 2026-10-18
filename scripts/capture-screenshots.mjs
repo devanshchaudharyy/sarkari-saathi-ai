@@ -18,57 +18,61 @@ const executablePath =
     "C:/Program Files/Google/Chrome/Application/chrome.exe",
   ].find(existsSync);
 const browser = await chromium.launch({ headless: true, executablePath });
-const requestContext = await browser.newContext();
-const registration = await requestContext.request.post(`${api}/auth/register`, {
-  data: {
-    name: "Demo Citizen",
-    email: `screenshots.${Date.now()}@example.com`,
-    password: "ScreenshotDemo123!",
-  },
-});
-assert.equal(registration.status(), 201);
-const { token } = await registration.json();
-const headers = { Authorization: `Bearer ${token}` };
-assert.equal(
-  (
-    await requestContext.request.put(`${api}/profile`, {
-      headers,
+try {
+  const language = process.env.SCREENSHOT_LANGUAGE === "hi" ? "hi" : "en";
+  const requestContext = await browser.newContext();
+  const registration = await requestContext.request.post(
+    `${api}/auth/register`,
+    {
       data: {
-        age: 24,
-        state: "Uttar Pradesh",
-        district: "Muzaffarnagar",
-        occupation: "student",
-        annualHouseholdIncome: 240000,
+        name: "Demo Citizen",
+        email: `screenshots.${Date.now()}@example.com`,
+        password: "ScreenshotDemo123!",
       },
-    })
-  ).status(),
-  200,
-);
-for (const slug of ["pmsby", "up-kanya-sumangala"]) {
-  const saved = await requestContext.request.put(`${api}/readiness/${slug}`, {
-    headers,
-    data: {},
-  });
-  assert.equal(saved.status(), 200);
-  const { entry } = await saved.json();
+    },
+  );
+  assert.equal(registration.status(), 201);
+  const { token } = await registration.json();
+  const headers = { Authorization: `Bearer ${token}` };
   assert.equal(
     (
-      await requestContext.request.patch(`${api}/readiness/${slug}`, {
+      await requestContext.request.put(`${api}/profile`, {
         headers,
         data: {
-          itemId: entry.items[0].id,
-          completed: true,
-          templateVersion: entry.templateVersion,
-          revision: entry.revision,
-          saveId: entry.saveId,
+          age: 24,
+          state: "Uttar Pradesh",
+          district: "Muzaffarnagar",
+          occupation: "student",
+          annualHouseholdIncome: 240000,
         },
       })
     ).status(),
     200,
   );
-}
-await mkdir("docs/screenshots", { recursive: true });
-try {
+  for (const slug of ["pmsby", "up-kanya-sumangala"]) {
+    const saved = await requestContext.request.put(`${api}/readiness/${slug}`, {
+      headers,
+      data: {},
+    });
+    assert.equal(saved.status(), 200);
+    const { entry } = await saved.json();
+    assert.equal(
+      (
+        await requestContext.request.patch(`${api}/readiness/${slug}`, {
+          headers,
+          data: {
+            itemId: entry.items[0].id,
+            completed: true,
+            templateVersion: entry.templateVersion,
+            revision: entry.revision,
+            saveId: entry.saveId,
+          },
+        })
+      ).status(),
+      200,
+    );
+  }
+  await mkdir("docs/screenshots", { recursive: true });
   for (const [device, viewport] of Object.entries({
     desktop: { width: 1440, height: 1000 },
     mobile: { width: 390, height: 844 },
@@ -78,6 +82,10 @@ try {
       reducedMotion: "reduce",
     });
     const page = await context.newPage();
+    await context.addInitScript(
+      (language) => localStorage.setItem("sarkarisaathi.language.v1", language),
+      language,
+    );
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
     const routes = [
@@ -102,6 +110,10 @@ try {
         { authenticated, token },
       );
       await page.goto(`${base}${route}`);
+      await page.waitForFunction(
+        (language) => document.documentElement.lang === language,
+        language,
+      );
       await page.locator(selector).first().waitFor();
       await page.evaluate(() => document.fonts.ready);
       if (name === "home") {
@@ -116,7 +128,7 @@ try {
       });
       await page.waitForTimeout(250);
       await page.screenshot({
-        path: `docs/screenshots/${name}-${device}.png`,
+        path: `docs/screenshots/${language === "hi" ? "hi-" : ""}${name}-${device}.png`,
         fullPage: true,
       });
       console.log(`Captured ${name}-${device}`);

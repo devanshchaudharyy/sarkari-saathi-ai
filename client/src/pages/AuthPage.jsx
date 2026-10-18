@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { useState } from "react";
 import { Navigate, Link, useLocation, useNavigate } from "react-router-dom";
 import {
@@ -9,6 +10,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import Brand from "../components/Brand";
+import LanguageSwitcher from "../components/LanguageSwitcher";
+import TranslationNotice from "../components/TranslationNotice";
 import Button from "../components/Button";
 import Field from "../components/Field";
 import Loader from "../components/Loader";
@@ -16,10 +19,15 @@ import { useAuth } from "../context/AuthContext";
 import { errorMessage } from "../api/axios";
 import { safeReturnPath } from "../utils/returnPath";
 export default function AuthPage({ register = false }) {
+  const { t } = useLanguage();
   const auth = useAuth(),
     navigate = useNavigate(),
     location = useLocation();
-  const [values, setValues] = useState({ name: "", email: "", password: "" }),
+  const [values, setValues] = useState({
+      name: "",
+      email: "",
+      password: "",
+    }),
     [errors, setErrors] = useState({}),
     [serverError, setServerError] = useState(""),
     [busy, setBusy] = useState(false);
@@ -62,19 +70,30 @@ export default function AuthPage({ register = false }) {
     try {
       await (register
         ? auth.register(values)
-        : auth.login({ email: values.email, password: values.password }));
-      navigate(destination, { replace: true });
+        : auth.login({
+            email: values.email,
+            password: values.password,
+          }));
+      navigate(destination, {
+        replace: true,
+      });
     } catch (error) {
       const message = errorMessage(error);
       setServerError(message);
-      toast.error(message);
+      toast.error(t(message));
     } finally {
       setBusy(false);
     }
   }
   const update = (event) => {
-    setValues({ ...values, [event.target.name]: event.target.value });
-    setErrors({ ...errors, [event.target.name]: "" });
+    setValues({
+      ...values,
+      [event.target.name]: event.target.value,
+    });
+    setErrors({
+      ...errors,
+      [event.target.name]: "",
+    });
     setServerError("");
   };
   return (
@@ -82,14 +101,17 @@ export default function AuthPage({ register = false }) {
       <aside className="auth-story">
         <Brand />
         <div className="auth-story-content">
-          <span className="eyebrow">A CLEARER PATH TO POSSIBILITY</span>
+          <span className="eyebrow">{t("A CLEARER PATH TO POSSIBILITY")}</span>
           <h1>
-            Discover opportunities
-            <br /> made for <em>you.</em>
+            {t("Discover opportunities")}
+            <br />
+            {t(" made for ")}
+            <em>{t("you.")}</em>
           </h1>
           <p>
-            Public benefits can be complex.
-            <br /> Understanding them shouldn’t be.
+            {t("Public benefits can be complex.")}
+            <br />
+            {t(" Understanding them shouldn\u2019t be.")}
           </p>
           <div className="auth-illustration" aria-hidden="true">
             <div className="auth-orbit" />
@@ -108,40 +130,50 @@ export default function AuthPage({ register = false }) {
           </div>
           <div className="auth-values">
             <span>
-              <Check size={15} /> Clear by design
+              <Check size={15} />
+              {t(" Clear by design")}
             </span>
             <span>
-              <Check size={15} /> Privacy in mind
+              <Check size={15} />
+              {t(" Privacy in mind")}
             </span>
           </div>
         </div>
         <p className="auth-disclaimer">
-          Independent project · Not an official government service
+          {t("Independent project \xB7 Not an official government service")}
         </p>
       </aside>
       <section className="auth-form-side">
+        <div className="auth-language">
+          <LanguageSwitcher />
+        </div>
         <Link className="back-link" to="/">
-          ← Back to home
+          {t("\u2190 Back to home")}
         </Link>
         <div className="auth-form-card">
+          <TranslationNotice />
           <span className="eyebrow">
-            {register
-              ? "YOUR JOURNEY STARTS HERE"
-              : "YOUR SPACE, YOUR POSSIBILITIES"}
+            {t(
+              register
+                ? "YOUR JOURNEY STARTS HERE"
+                : "YOUR SPACE, YOUR POSSIBILITIES",
+            )}
           </span>
-          <h2>{register ? "Create your account" : "Welcome back."}</h2>
+          <h2>{t(register ? "Create your account" : "Welcome back.")}</h2>
           <p>
-            {register
-              ? "A simple first step toward a little more clarity."
-              : "Sign in to your SarkariSaathi account."}
+            {t(
+              register
+                ? "A simple first step toward a little more clarity."
+                : "Sign in to your SarkariSaathi account.",
+            )}
           </p>
           <form onSubmit={submit} noValidate>
             {register ? (
               <Field
                 id="name"
                 name="name"
-                label="Full name"
-                placeholder="Your full name"
+                label={t("Full name")}
+                placeholder={t("Your full name")}
                 autoComplete="name"
                 value={values.name}
                 onChange={update}
@@ -153,8 +185,8 @@ export default function AuthPage({ register = false }) {
               id="email"
               name="email"
               type="email"
-              label="Email address"
-              placeholder="you@example.com"
+              label={t("Email address")}
+              placeholder={t("you@example.com")}
               autoComplete="email"
               value={values.email}
               onChange={update}
@@ -165,58 +197,62 @@ export default function AuthPage({ register = false }) {
               id="password"
               name="password"
               type="password"
-              label="Password"
-              placeholder={
-                register ? "Create a strong password" : "Enter your password"
-              }
+              label={t("Password")}
+              placeholder={t(
+                register ? "Create a strong password" : "Enter your password",
+              )}
               autoComplete={register ? "new-password" : "current-password"}
               value={values.password}
               onChange={update}
               error={errors.password}
-              helper={
+              helper={t(
                 register
                   ? "At least 8 characters. Use a unique password."
-                  : undefined
-              }
+                  : undefined,
+              )}
             />
             {serverError ? (
               <div role="alert" className="form-alert">
-                {serverError}
+                {t(serverError)}
               </div>
             ) : null}
             <Button type="submit" loading={busy} className="w-full">
-              {busy
-                ? register
-                  ? "Creating your account…"
-                  : "Signing you in…"
-                : register
-                  ? "Create account"
-                  : "Sign in"}{" "}
+              {t(
+                busy
+                  ? register
+                    ? "Creating your account…"
+                    : "Signing you in…"
+                  : register
+                    ? "Create account"
+                    : "Sign in",
+              )}{" "}
               {!busy ? <ArrowRight size={18} /> : null}
             </Button>
           </form>
           <p className="auth-switch">
-            {register ? "Already have an account?" : "New to SarkariSaathi?"}{" "}
+            {t(register ? "Already have an account?" : "New to SarkariSaathi?")}{" "}
             <Link to={register ? "/login" : "/register"}>
-              {register ? "Log in" : "Create an account"}
+              {t(register ? "Log in" : "Create an account")}
             </Link>
           </p>
           <div className="auth-privacy">
             <ShieldCheck size={18} />
             <span>
-              Only the basics. Your name, email, and a securely hashed password.
+              {t(
+                "Only the basics. Your name, email, and a securely hashed password.",
+              )}
             </span>
           </div>
           {register ? (
             <p className="auth-availability">
-              Accounts, profiles and public scheme browsing are available today.
-              Personalised discovery and AI features are coming in future
-              phases.
+              {t(
+                "Accounts, profiles and public scheme browsing are available today. Personalised discovery and AI features are coming in future phases.",
+              )}
             </p>
           ) : null}
         </div>
         <span className="auth-bottom">
-          A little clarity. A world of possibility.
+          {t("A little clarity. A world of possibility.")}
         </span>
       </section>
     </main>

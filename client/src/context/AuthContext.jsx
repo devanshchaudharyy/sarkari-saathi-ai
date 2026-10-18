@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import api, {
@@ -9,6 +10,7 @@ import api, {
 const Context = createContext(null);
 export const useAuth = () => useContext(Context);
 export function AuthProvider({ children }) {
+  const { t } = useLanguage();
   const [user, setUser] = useState(null),
     [token, setToken] = useState(readToken),
     [loading, setLoading] = useState(true),
@@ -51,7 +53,7 @@ export function AuthProvider({ children }) {
           error.config?.headers?.Authorization === `Bearer ${readToken()}`
         ) {
           clear();
-          toast.error("Your session has expired. Please sign in again.");
+          toast.error(t("Your session has expired. Please sign in again."));
         }
         return Promise.reject(error);
       },
@@ -79,9 +81,11 @@ export function AuthProvider({ children }) {
     setUser(data.user);
     setSessionError("");
     toast.success(
-      path.endsWith("register")
-        ? "Account created. Welcome to SarkariSaathi!"
-        : "Welcome back!",
+      t(
+        path.endsWith("register")
+          ? "Account created. Welcome to SarkariSaathi!"
+          : "Welcome back!",
+      ),
     );
     return data.user;
   }
@@ -97,11 +101,11 @@ export function AuthProvider({ children }) {
         register: (input) => authenticate("/auth/register", input),
         logout: () => {
           clear();
-          toast.success("You have been signed out.");
+          toast.success(t("You have been signed out."));
         },
       }}
     >
-      {children}
+      {t(children)}
     </Context.Provider>
   );
 }

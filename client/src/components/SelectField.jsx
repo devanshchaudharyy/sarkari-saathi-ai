@@ -1,3 +1,4 @@
+import { useLanguage } from "../i18n/useLanguage";
 export default function SelectField({
   id,
   label,
@@ -7,9 +8,10 @@ export default function SelectField({
   placeholder = "Select an option",
   ...props
 }) {
+  const { t } = useLanguage();
   return (
     <div className="field">
-      <label htmlFor={id}>{label}</label>
+      <label htmlFor={id}>{t(label)}</label>
       <div className="input-wrap">
         <select
           id={id}
@@ -19,21 +21,21 @@ export default function SelectField({
           }
           {...props}
         >
-          <option value="">{placeholder}</option>
+          <option value="">{t(placeholder)}</option>
           {options.map(({ value, label }) => (
             <option key={value} value={value}>
-              {label}
+              {t(label)}
             </option>
           ))}
         </select>
       </div>
       {error ? (
         <p id={`${id}-error`} className="field-error">
-          {error}
+          {t(error)}
         </p>
       ) : helper ? (
         <p id={`${id}-helper`} className="field-helper">
-          {helper}
+          {t(helper)}
         </p>
       ) : null}
     </div>
