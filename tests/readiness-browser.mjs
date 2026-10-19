@@ -406,7 +406,7 @@ try {
     },
   );
   await check(
-    "Seven widths fit saved lists, all six previews and five navigation links",
+    "Seven widths fit saved lists, all six previews and six navigation links",
     async () => {
       for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
         await page.setViewportSize({ width, height: 950 });

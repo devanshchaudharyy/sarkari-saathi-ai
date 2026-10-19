@@ -10,9 +10,13 @@ export function safeReturnPath(value) {
     const url = new URL(value, "https://internal.invalid");
     if (
       url.origin !== "https://internal.invalid" ||
-      !["/dashboard", "/profile", "/eligibility", "/readiness"].includes(
-        url.pathname,
-      )
+      ![
+        "/dashboard",
+        "/profile",
+        "/eligibility",
+        "/readiness",
+        "/discover",
+      ].includes(url.pathname)
     )
       return "/dashboard";
     return `${url.pathname}${url.search}`;

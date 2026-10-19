@@ -389,7 +389,7 @@ function ProfileForm({ initial, onSaved }) {
           </p>
           <p>
             {t(
-              "These details are a foundation for future features. Scheme matching and AI assistance aren\u2019t available yet.",
+              "These details support partial screening and your grouped shortlist. AI assistance remains a future feature.",
             )}
           </p>
         </div>

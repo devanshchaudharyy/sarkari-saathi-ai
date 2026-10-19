@@ -123,6 +123,16 @@ export default function Dashboard() {
             </div>
             <h3>{t(title)}</h3>
             <p>{t(text)}</p>
+            {title === "Scheme Discovery" && (
+              <Button
+                to="/discover"
+                variant="secondary"
+                className="discovery-shortcut"
+              >
+                {t("Open my shortlist")}
+                <ArrowRight size={15} />
+              </Button>
+            )}
             {title === "Scheme Discovery" ||
             title === "Application Readiness" ? (
               <Button

@@ -1,6 +1,6 @@
-# SarkariSaathi AI — Phases 1–6
+# SarkariSaathi AI — Phases 1–7
 
-A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. Phase 6 adds Hindi/English support across those features. AI assistance remains skipped. This is an independent project, not an official government service.
+A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. Phase 6 adds Hindi/English support across those features. Phase 7 adds an explainable grouped scheme shortlist using the same screening rules. AI assistance remains skipped. This is an independent project, not an official government service.
 
 ## Screenshots
 
@@ -8,7 +8,21 @@ A MERN application for understanding government schemes. Phase 1 provides authen
 
 ![Private saved schemes and preparation checklists](docs/screenshots/readiness-desktop.png)
 
-See the [English and Hindi desktop/mobile screenshot gallery](docs/screenshots/README.md) for all nine pages. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate English images; set `SCREENSHOT_LANGUAGE=hi` for Hindi.
+See the [English and Hindi desktop/mobile screenshot gallery](docs/screenshots/README.md) for all ten pages. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate English images; set `SCREENSHOT_LANGUAGE=hi` for Hindi.
+
+## Phase 7: explainable scheme shortlist
+
+Open [My shortlist](http://localhost:5176/discover) after signing in, through workspace navigation or the dashboard. The view groups the reviewed catalog into **Basic matches to review**, **Clarify these next**, **A checked condition does not match**, and **Not screened**. It uses the existing server screening result; no second eligibility engine, AI model, score, approval probability or database collection is introduced. Names remain alphabetical by original English name within each group. Missing answers never become positive matches, and a known failure stays separate from missing information.
+
+Start with your saved profile. Expand optional clarification questions to supply this visit's additional facts, then update the shortlist. The same questions, partial rules, explanations, sources and limitations as screening apply. Changing an answer hides the old groups/counts until confirmed by the server. Extra answers reset on refresh, navigation, reload or account change and are never stored in the account or localStorage. The separate screening page's temporary answers are not imported. A network failure preserves answers and session without publishing a new group decision.
+
+Filter by category or checked status. Full-catalog counts stay visible independently of the filtered list; zero-result views are explicit. The URL preserves canonical `category`, `status` and optional clarification `scheme` values. Unsupported/repeated values fall back with a notice. Filters are presentation-only and are never sent as profile/owner overrides. Safe login redirects preserve internal shortlist queries. Each card links to reasons, official sources, details, profile edits or the existing preparation checklist. Hindi and English are supported throughout.
+
+This is a partial new-application screen, not a recommendation to apply, verified entitlement, comprehensive directory or government approval. All previous rule boundaries remain: no citizenship/tax/landownership inference, no account-holder-age substitution for a girl, APY birthday/tax clarification, PMSBY provider clarification at 70, and UP stage/family checks. Source/rule review dates remain 8 October 2026; this phase did not rereview official policy. See [Phase 7 verification](docs/PHASE7-VERIFICATION.md).
+
+This phase is isolated in the sibling folder `sarkari-saathi-ai-phase7` on branch `phase-7-shortlist`. The original Phase 6 checkout stays on `main`. The new local frontend uses **5176**, API **5001**, and development database **sarkari_saathi_ai_phase7**, with its own ignored environments and locally generated JWT secret. Both folders share Git history through a worktree; dependencies, runtime ports, browser origins and development data are separate.
+
+Implementation: `shared/discovery.js` defines transparent grouping and safe view parsing; `useDiscovery` owns page-local answers and confirmation state; `Discovery` composes the existing assessment/question UI. GET/POST `/api/eligibility` are reused unchanged. No new endpoint, request schema, secret setting or migration is required. The existing 55-request Postman collection remains applicable; browser tests execute the live profile → screening → grouped view → preparation flow.
 
 ## Phase 6: Hindi / English
 
@@ -24,7 +38,7 @@ See [localization architecture and maintenance](docs/I18N.md) and [Phase 6 verif
 
 ## Phase 5: application readiness
 
-Open [preparation](http://localhost:5175/readiness) after signing in. Workspace navigation and the dashboard open your saved list; scheme details and screening results open `/readiness?scheme=<slug>`. Login retains that safe internal destination. Preview any of the six checklists, save a scheme, and mark or unmark individual tasks. Saved schemes and confirmed progress persist through refresh and signing in again. Official references appear beside each task, with a separate official next-steps link.
+Open [preparation](http://localhost:5176/readiness) after signing in. Workspace navigation and the dashboard open your saved list; scheme details and screening results open `/readiness?scheme=<slug>`. Login retains that safe internal destination. Preview any of the six checklists, save a scheme, and mark or unmark individual tasks. Saved schemes and confirmed progress persist through refresh and signing in again. Official references appear beside each task, with a separate official next-steps link.
 
 Progress means **self-marked completion of the listed preparation tasks**, not eligibility, document verification, a submitted application, payment consent or government approval. Templates are partial preparation guides; the provider determines the current complete requirements. UP evidence varies by support stage and family circumstances, and bank KYC alternatives vary by the applicable process. No uploads, Aadhaar/bank numbers, document contents or free-text notes are collected. Only scheme slugs and task marks are stored in the new owner-scoped `SavedScheme` collection, with version/revision metadata and timestamps. Users and profiles are unchanged.
 
@@ -43,7 +57,7 @@ New reusable pieces: ReadinessCard, RemoveSavedDialog, useReadiness and `readine
 
 ## Phase 4: explainable screening
 
-Open [screening](http://localhost:5175/eligibility) after signing in, through workspace navigation, the dashboard or a scheme detail. A detail opens `/eligibility?scheme=<slug>`; login safely retains that internal destination. Choose one scheme or all six. Saved profile facts provide the starting point, while native Yes/No/Not sure controls and a UP-stage select fill missing facts. Additional answers are sent only when Run screening is pressed and are **not persisted** to MongoDB or browser storage. They reset on refresh, route departure, account change or Reload saved details. Reset answers clears local answers and requires a new screen if they differ from the previous submission.
+Open [screening](http://localhost:5176/eligibility) after signing in, through workspace navigation, the dashboard or a scheme detail. A detail opens `/eligibility?scheme=<slug>`; login safely retains that internal destination. Choose one scheme or all six. Saved profile facts provide the starting point, while native Yes/No/Not sure controls and a UP-stage select fill missing facts. Additional answers are sent only when Run screening is pressed and are **not persisted** to MongoDB or browser storage. They reset on refresh, route departure, account change or Reload saved details. Reset answers clears local answers and requires a new screen if they differ from the previous submission.
 
 Results show **Basic criteria match**, **More information needed**, or **A checked criterion isn’t met**, with rule-by-rule reasons, missing-information actions, official references, limitations, review date and rule version. A known failure takes precedence over unknown facts without hiding those unknowns. Edited answers hide the previous report until it is rerun. Results stay alphabetical; there are no recommendation rankings, confidence scores or approval claims. Unsupported future catalog entries are explicitly Not screened.
 
@@ -60,7 +74,7 @@ Rules are reviewed static JavaScript in `server/src/domain/eligibility.js`, vers
 
 ## Phase 3: official scheme browsing
 
-Open [the scheme library](http://localhost:5175/schemes). Six manually reviewed schemes cover agriculture, insurance, pensions, banking, and girls’ education. Browse without an account; search names, acronyms and keywords, filter category/central-or-state/location, and open detail pages for benefits, intended audience, next steps and official references. Query parameters persist search/filter/page state through refresh, sharing and browser history. Details retain the list query in their URL, so Back to schemes preserves the current view.
+Open [the scheme library](http://localhost:5176/schemes). Six manually reviewed schemes cover agriculture, insurance, pensions, banking, and girls’ education. Browse without an account; search names, acronyms and keywords, filter category/central-or-state/location, and open detail pages for benefits, intended audience, next steps and official references. Query parameters persist search/filter/page state through refresh, sharing and browser history. Details retain the list query in their URL, so Back to schemes preserves the current view.
 
 The catalog is a small editorial collection, not a comprehensive directory. Central schemes are included for every location; state-scheme coverage currently includes Uttar Pradesh only. Filters describe scheme coverage, not personal eligibility. Profiles do not populate filters or influence browsing order (alphabetical). Screening is a separate signed-in action; browsing does not automatically screen a person.
 
@@ -111,7 +125,7 @@ New reusable pieces: WorkspaceLayout, SelectField, ProfileProgress, LeaveProfile
 
 ## Run locally
 
-Requirements: Node.js 22.12+ (verified environment: Node 24), npm, and a running local MongoDB service. Run commands from `sarkari-saathi-ai`.
+Requirements: Node.js 22.12+ (verified environment: Node 24), npm, and a running local MongoDB service. Run commands from `sarkari-saathi-ai-phase7`.
 
 ```powershell
 npm install
@@ -124,7 +138,7 @@ npm run seed:schemes
 npm run dev
 ```
 
-**This delivery runs at http://localhost:5175** because ports 5173 and 5174 were already occupied. Example configuration defaults to 5173 for a fresh checkout. API health: http://localhost:5000/api/health. The API and production preview are left running for manual testing.
+**This isolated Phase 7 delivery runs at http://localhost:5176**, with API health at http://localhost:5001/api/health. The original Phase 6 folder retains ports 5175/5000. Examples default to 5173/5000 for a fresh checkout. The API and production preview are left running for manual testing.
 
 Changing the frontend port requires updating both `VITE_DEV_PORT` in `client/.env` and `CLIENT_URL` in `server/.env`, then restarting both processes. Open the browser using `localhost` to match the exact CORS origin.
 
@@ -144,7 +158,7 @@ npm run preview -w client
 
 ## Environment configuration
 
-| Location    | Variable       | Development value / purpose                           |
+| Location    | Variable       | Example default / purpose                             |
 | ----------- | -------------- | ----------------------------------------------------- |
 | server/.env | PORT           | 5000                                                  |
 | server/.env | MONGO_URI      | mongodb://127.0.0.1:27017/sarkari_saathi_ai           |
@@ -153,23 +167,23 @@ npm run preview -w client
 | server/.env | CLIENT_URL     | http://localhost:5173; exact allowed browser origin   |
 | server/.env | NODE_ENV       | development, production, or test                      |
 | client/.env | VITE_API_URL   | http://localhost:5000/api; public URL, never a secret |
-| client/.env | VITE_DEV_PORT  | 5173 by default; configured locally as 5175           |
+| client/.env | VITE_DEV_PORT  | 5173 by default; configured locally as 5176           |
 
 The `.gitignore` excludes actual environment files, dependencies, build output, and generated reports. Examples are safe to commit. Do not replace the examples with live credentials. Use `localhost` consistently when opening the frontend because the API allowlist is exact.
 
 ## Architecture and folder structure
 
 ```text
-sarkari-saathi-ai/
+sarkari-saathi-ai-phase7/
   client/
     public/favicon.svg
     src/
       api/axios.js
       components/   # Shared UI, ProfileProgress, dialogs, AssessmentCard, ReadinessCard
       context/AuthContext.jsx
-      hooks/        # useReveal, useProfile, useSchemes, useEligibility, useReadiness
+      hooks/        # useReveal, useProfile, useSchemes, useEligibility, useReadiness, useDiscovery
       layouts/      # MainLayout.jsx, WorkspaceLayout.jsx
-      pages/        # Home, auth, Dashboard, Profile, Schemes, SchemeDetail, Eligibility, Readiness, NotFound
+      pages/        # Home, auth, Dashboard, Profile, Schemes, SchemeDetail, Eligibility, Readiness, Discovery, NotFound
       utils/returnPath.js
       App.jsx
       main.jsx
@@ -179,6 +193,7 @@ sarkari-saathi-ai/
       eligibility.css
       readiness.css
       i18n.css
+      discovery.css
       i18n/         # core.js, useLanguage.js, lazy-loaded hi.json
     .env.example
     index.html
@@ -203,11 +218,13 @@ sarkari-saathi-ai/
   shared/profile.js
   shared/schemes.js
   shared/eligibility.js
+  shared/discovery.js
   tests/            # browser.mjs and profile/schemes/eligibility/readiness-browser.mjs
   scripts/create-postman.mjs
   scripts/audit-phase4.mjs
   scripts/audit-phase5.mjs
   scripts/audit-phase6.mjs
+  scripts/audit-phase7.mjs
   scripts/capture-screenshots.mjs
   docs/
     SarkariSaathi.postman_collection.json
@@ -221,7 +238,8 @@ sarkari-saathi-ai/
     PHASE5-VERIFICATION.md
     I18N.md
     PHASE6-VERIFICATION.md
-    screenshots/    # Nine pages, English/Hindi, desktop/mobile
+    PHASE7-VERIFICATION.md
+    screenshots/    # Ten pages, English/Hindi, desktop/mobile
   package.json
   package-lock.json
   .gitignore
@@ -269,15 +287,16 @@ npm run test:schemes-browser
 npm run test:eligibility-browser
 npm run test:readiness-browser
 npm run test:language-browser
+npm run test:discovery-browser
 # Production frontend build and running API/preview required:
-npm run audit:phase6
+npm run audit:phase7
 ```
 
-`npm test` runs the 170 API/domain tests and 23 translation/coverage tests; `npm run test:i18n` runs only localization tests. Backend suites create and remove their own uniquely named test databases, with separate names for auth, profile, scheme, screening and readiness tests. They do not wipe the development database. Browser tests create uniquely named synthetic accounts, profiles and saved schemes in the development database; these remain available for inspection. Browser tests use installed Edge or Chrome; set `BROWSER_PATH` for another Chromium executable. The Phase 6 audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and a persistent browser profile in ignored `reports/`, and preserves storage to reach the private page. It measures English/Hindi landing pages and Hindi preparation. Run Lighthouse separately from browser suites to avoid competing for CPU.
+`npm test` runs the 170 API/domain tests, 23 translation/coverage tests and 18 discovery presentation tests; `npm run test:i18n` runs only localization tests. Backend suites create and remove their own uniquely named test databases, with separate names for auth, profile, scheme, screening and readiness tests. They do not wipe the development database. Browser tests create uniquely named synthetic accounts, profiles and saved schemes in the development database; these remain available for inspection. Browser tests use installed Edge or Chrome; set `BROWSER_PATH` for another Chromium executable. The Phase 7 audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and a persistent browser profile in ignored `reports/`, and preserves storage to reach the private page. It measures the authenticated shortlist in English and Hindi. Run Lighthouse separately from browser suites to avoid competing for CPU.
 
 Import `docs/SarkariSaathi.postman_collection.json` into Postman. Run the 55 requests in order; Health initializes a unique account email, registration/login capture the token, and readiness mutations capture the returned revision/save ID. Assertions check status/error safety. It creates a synthetic account in the configured API database. All request scripts and substituted JSON parse; equivalent HTTP scenarios run through Supertest. Postman desktop itself was not run. Expired-token and production-error scenarios are covered by the automated backend suite.
 
-See [Phase 6 verification](docs/PHASE6-VERIFICATION.md) for current API, localization, browser, responsive, animation and security results, including measured Lighthouse scores and limitations. Earlier verification records are retained. Local audit observations are not a production or real-user performance guarantee.
+See [Phase 7 verification](docs/PHASE7-VERIFICATION.md) for current API, localization, browser, responsive, animation and security results, including measured Lighthouse scores and limitations. Earlier verification records are retained. Local audit observations are not a production or real-user performance guarantee.
 
 ## Current boundaries and known limitations
 

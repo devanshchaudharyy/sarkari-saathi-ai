@@ -1,6 +1,6 @@
 # Project screenshots
 
-Captured **18 October 2026** from the local production frontend, after adding Hindi/English support. Desktop viewport: 1440 × 1000. Mobile viewport: 390 × 844. These are full-page captures; pages can extend beyond one viewport. All citizen details and checklist marks shown are synthetic demo data. No real account, document, bank or identity data are used.
+Captured **19 October 2026** from the local production frontend, from the isolated Phase 7 folder. Desktop viewport: 1440 × 1000. Mobile viewport: 390 × 844. These are full-page captures; pages can extend beyond one viewport. All citizen details and checklist marks shown are synthetic demo data. No real account, document, bank or identity data are used.
 
 ## English
 
@@ -12,6 +12,7 @@ Captured **18 October 2026** from the local production frontend, after adding Hi
 | Scheme library                | [View](schemes-desktop.png)       | [View](schemes-mobile.png)       |
 | PM-KISAN detail               | [View](scheme-detail-desktop.png) | [View](scheme-detail-mobile.png) |
 | Dashboard                     | [View](dashboard-desktop.png)     | [View](dashboard-mobile.png)     |
+| Scheme shortlist              | [View](shortlist-desktop.png)     | [View](shortlist-mobile.png)     |
 | Citizen profile               | [View](profile-desktop.png)       | [View](profile-mobile.png)       |
 | Partial eligibility screening | [View](eligibility-desktop.png)   | [View](eligibility-mobile.png)   |
 | Saved schemes and preparation | [View](readiness-desktop.png)     | [View](readiness-mobile.png)     |
@@ -28,12 +29,13 @@ Hindi text is the project's translation, not an official government translation.
 | Scheme library                | [View](hi-schemes-desktop.png)       | [View](hi-schemes-mobile.png)       |
 | PM-KISAN detail               | [View](hi-scheme-detail-desktop.png) | [View](hi-scheme-detail-mobile.png) |
 | Dashboard                     | [View](hi-dashboard-desktop.png)     | [View](hi-dashboard-mobile.png)     |
+| Scheme shortlist              | [View](hi-shortlist-desktop.png)     | [View](hi-shortlist-mobile.png)     |
 | Citizen profile               | [View](hi-profile-desktop.png)       | [View](hi-profile-mobile.png)       |
 | Partial eligibility screening | [View](hi-eligibility-desktop.png)   | [View](hi-eligibility-mobile.png)   |
 | Saved schemes and preparation | [View](hi-readiness-desktop.png)     | [View](hi-readiness-mobile.png)     |
 
 To reproduce, start the configured API and frontend, load the six schemes with `npm run seed:schemes`, then run `npm run screenshots` from the project root. The helper creates a unique synthetic demo account/profile and two saved schemes in the development database, leaving them available for inspection. It reads the local frontend/API origins, supports `FRONTEND_URL`, `API_URL` and `BROWSER_PATH` overrides, and never writes the session token into committed files. It defaults to installed Edge or Chrome, respects reduced motion during capture, waits for fonts/data and asserts no browser JavaScript exceptions.
 
-For Hindi in PowerShell, set `$env:SCREENSHOT_LANGUAGE='hi'` before the command, then `Remove-Item Env:SCREENSHOT_LANGUAGE` afterwards. Hindi captures use the `hi-` filename prefix. The combined gallery contains 36 images covering nine pages, two languages and two viewports. Startup/capture failures close the browser before propagating the error.
+For Hindi in PowerShell, set `$env:SCREENSHOT_LANGUAGE='hi'` before the command, then `Remove-Item Env:SCREENSHOT_LANGUAGE` afterwards. Hindi captures use the `hi-` filename prefix. The combined gallery contains 40 images covering ten pages, two languages and two viewports. Startup/capture failures close the browser before propagating the error.
 
 Checklist completion and screening results are partial, self-reported guidance, not official approval. SarkariSaathi is an independent project and is not an official government service.

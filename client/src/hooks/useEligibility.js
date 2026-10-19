@@ -34,6 +34,9 @@ export default function useEligibility() {
     ...(resource.owner === user.id
       ? resource
       : { data: null, loading: true, error: null }),
-    retry: () => setAttempt((current) => current + 1),
+    retry: () => {
+      setResource({ owner: user.id, data: null, loading: true, error: null });
+      setAttempt((current) => current + 1);
+    },
   };
 }

@@ -51,6 +51,15 @@ export default function WorkspaceLayout() {
             {t(" Schemes")}
           </NavLink>
           <NavLink
+            to="/discover"
+            className={({ isActive }) =>
+              isActive ? "sidebar-active" : "sidebar-link"
+            }
+          >
+            <Compass size={19} />
+            {t("My shortlist")}
+          </NavLink>
+          <NavLink
             to="/eligibility"
             className={({ isActive }) =>
               isActive ? "sidebar-active" : "sidebar-link"
@@ -102,9 +111,11 @@ export default function WorkspaceLayout() {
                   ? "My profile"
                   : location.pathname === "/eligibility"
                     ? "Screening"
-                    : location.pathname === "/readiness"
-                      ? "Preparation"
-                      : "Overview",
+                    : location.pathname === "/discover"
+                      ? "My shortlist"
+                      : location.pathname === "/readiness"
+                        ? "Preparation"
+                        : "Overview",
               )}
             </span>
           </span>
@@ -128,7 +139,7 @@ export default function WorkspaceLayout() {
           <TranslationNotice />
           <footer className="dashboard-footer">
             {t("Independent project. Not an official government service.")}
-            <span>{t("SarkariSaathi AI \xB7 Phase 06")}</span>
+            <span>{t("SarkariSaathi AI · Phase 07")}</span>
           </footer>
         </div>
       </main>

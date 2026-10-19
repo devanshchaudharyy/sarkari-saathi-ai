@@ -17,7 +17,9 @@ const profileLabels = {
 export default function AssessmentCard({ result, onQuestions }) {
   const { t } = useLanguage();
   const assessment = result.assessment;
-  const status = SCREENING_STATUSES[assessment.status];
+  const status = Object.hasOwn(SCREENING_STATUSES, assessment.status)
+    ? SCREENING_STATUSES[assessment.status]
+    : SCREENING_STATUSES.not_assessed;
   const Icon =
     assessment.status === "basic_match"
       ? Check

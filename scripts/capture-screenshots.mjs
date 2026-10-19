@@ -95,6 +95,7 @@ try {
       ["schemes", "/schemes", false, ".scheme-card"],
       ["scheme-detail", "/schemes/pm-kisan", false, ".scheme-detail-layout"],
       ["dashboard", "/dashboard", true, ".dashboard-grid"],
+      ["shortlist", "/discover", true, ".discovery-counts"],
       ["profile", "/profile", true, "#profile-age"],
       ["eligibility", "/eligibility", true, ".assessment-card"],
       ["readiness", "/readiness", true, ".readiness-card"],

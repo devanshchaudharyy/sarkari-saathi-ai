@@ -16,6 +16,7 @@ import "./schemes.css";
 import "./eligibility.css";
 import "./readiness.css";
 import "./i18n.css";
+import "./discovery.css";
 import { router } from "./App";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -171,7 +171,7 @@ export default function Home() {
               {t(" Your journey starts with a simple account.")}
             </p>
             <div className="phase-note">
-              <span>{t("PHASE 06")}</span>
+              <span>{t("PHASE 07")}</span>
               {t(
                 " Save schemes and prepare at your pace. Official verification still applies.",
               )}
