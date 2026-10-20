@@ -1,5 +1,5 @@
 import { useLanguage } from "../i18n/useLanguage";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
   ListChecks,
@@ -83,6 +83,7 @@ function EligibilityForm({ initial, reload }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const controller = useRef(null),
+    focusResults = useRef(false),
     resultsHeading = useRef(null),
     questionsHeading = useRef(null);
   useEffect(() => () => controller.current?.abort(), []);
@@ -100,6 +101,12 @@ function EligibilityForm({ initial, reload }) {
   );
   const groups = [...new Set(questions.map((question) => question.group))];
   const dirty = JSON.stringify(answers) !== submitted;
+  useLayoutEffect(() => {
+    if (focusResults.current && !busy && !dirty) {
+      focusResults.current = false;
+      focusSection(resultsHeading);
+    }
+  });
   function chooseScheme(slug) {
     const next = new URLSearchParams();
     if (slug !== "all") next.set("scheme", slug);
@@ -146,12 +153,12 @@ function EligibilityForm({ initial, reload }) {
         signal: requestController.signal,
       });
       if (requestController.signal.aborted) return;
+      focusResults.current = true;
       setReport(data);
       setSubmitted(JSON.stringify(payload.answers));
       toast.success(
         t("Screening updated. Review the reasons and remaining conditions."),
       );
-      requestAnimationFrame(() => focusSection(resultsHeading));
     } catch (error) {
       if (requestController.signal.aborted) return;
       setError(`${errorMessage(error)} Your answers are still here.`);

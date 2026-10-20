@@ -7,7 +7,9 @@ const env = await readFile("client/.env", "utf8"),
     process.env.FRONTEND_URL ||
     `http://localhost:${/^VITE_DEV_PORT=(\d+)/m.exec(env)?.[1] || "5173"}`,
   api =
-    /^VITE_API_URL=(.+)/m.exec(env)?.[1]?.trim() || "http://localhost:5000/api";
+    process.env.API_URL ||
+    /^VITE_API_URL=(.+)/m.exec(env)?.[1]?.trim() ||
+    "http://localhost:5000/api";
 const browser = await chromium.launch({
   headless: true,
   executablePath:
@@ -240,6 +242,9 @@ try {
       await page
         .getByLabel("Category", { exact: true })
         .selectOption("insurance");
+      await page.waitForFunction(
+        () => document.querySelectorAll(".assessment-card").length === 2,
+      );
       assert.equal(await page.locator(".assessment-card").count(), 2);
       await page
         .getByLabel("Checked status", { exact: true })
@@ -255,7 +260,10 @@ try {
         "basic_match",
       );
       await page.getByRole("button", { name: "Clear view filters" }).click();
-      await ready();
+      // Counts stay mounted while React Router commits a view-only query change.
+      await page.waitForFunction(
+        () => document.querySelectorAll(".assessment-card").length === 6,
+      );
       assert.equal(await page.locator(".assessment-card").count(), 6);
     },
   );

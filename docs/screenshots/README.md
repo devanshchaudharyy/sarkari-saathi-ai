@@ -1,6 +1,6 @@
 # Project screenshots
 
-Captured **19 October 2026** from the local production frontend, from the isolated Phase 7 folder. Desktop viewport: 1440 × 1000. Mobile viewport: 390 × 844. These are full-page captures; pages can extend beyond one viewport. All citizen details and checklist marks shown are synthetic demo data. No real account, document, bank or identity data are used.
+Captured **20 October 2026** from the consolidated Phase 8 production server at localhost:5176. Desktop viewport: 1440 × 1000. Mobile viewport: 390 × 844. These are full-page captures; pages can extend beyond one viewport. All citizen details and checklist marks shown are synthetic demo data. No real account, document, bank or identity data are used.
 
 ## English
 

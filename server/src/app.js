@@ -8,9 +8,15 @@ import schemeRoutes from "./routes/schemeRoutes.js";
 import eligibilityRoutes from "./routes/eligibilityRoutes.js";
 import readinessRoutes from "./routes/readinessRoutes.js";
 import { HttpError, errorMiddleware } from "./middleware/errorMiddleware.js";
+import { readiness, requireDatabase } from "./middleware/availability.js";
+import { mountClient } from "./middleware/client.js";
 const app = express();
 app.disable("x-powered-by");
 app.use(helmet());
+app.use("/api", (req, res, next) => {
+  res.set("Cache-Control", "no-store");
+  next();
+});
 app.use(
   cors({
     origin: (origin, callback) =>
@@ -23,11 +29,18 @@ app.use(express.json({ limit: "16kb" }));
 app.get("/api/health", (req, res) =>
   res.json({ success: true, message: "SarkariSaathi API is running" }),
 );
+app.get("/api/ready", readiness);
+app.use("/api", requireDatabase);
 app.use("/api/auth", authRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/schemes", schemeRoutes);
 app.use("/api/eligibility", eligibilityRoutes);
 app.use("/api/readiness", readinessRoutes);
+// An API miss must keep its JSON contract even when the client is also served.
+app.use("/api", (req, res, next) =>
+  next(new HttpError(404, "Endpoint not found.")),
+);
+if (env.SERVE_CLIENT) mountClient(app);
 app.use((req, res, next) => next(new HttpError(404, "Endpoint not found.")));
 app.use(errorMiddleware);
 export default app;

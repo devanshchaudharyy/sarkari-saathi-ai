@@ -12,6 +12,7 @@ const localEnv = await readFile("client/.env", "utf8").catch(() => "");
 const port = /^VITE_DEV_PORT=(\d+)/m.exec(localEnv)?.[1] || "5173";
 const base = process.env.FRONTEND_URL || `http://localhost:${port}`;
 const api =
+  process.env.API_URL ||
   /^VITE_API_URL=(.+)/m.exec(localEnv)?.[1]?.trim() ||
   "http://localhost:5000/api";
 const browser = await chromium.launch({ headless: true, executablePath });

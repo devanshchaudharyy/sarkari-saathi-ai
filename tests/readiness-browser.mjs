@@ -7,6 +7,7 @@ const env = await readFile("client/.env", "utf8"),
     process.env.FRONTEND_URL ||
     `http://localhost:${/^VITE_DEV_PORT=(\d+)/m.exec(env)?.[1] || "5173"}`,
   api =
+    process.env.API_URL ||
     /^VITE_API_URL=(.+)/m.exec(env)?.[1]?.trim() || "http://localhost:5000/api";
 const executablePath =
   process.env.BROWSER_PATH ||

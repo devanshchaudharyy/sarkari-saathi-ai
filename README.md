@@ -1,6 +1,16 @@
-# SarkariSaathi AI — Phases 1–7
+# SarkariSaathi AI — Phases 1–8
 
-A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. Phase 6 adds Hindi/English support across those features. Phase 7 adds an explainable grouped scheme shortlist using the same screening rules. AI assistance remains skipped. This is an independent project, not an official government service.
+A MERN application for understanding government schemes. Phase 1 provides authentication and a polished responsive interface. Phase 2 adds private citizen profiles. Phase 3 adds public official-source scheme browsing. Phase 4 adds explainable, partial screening of basic criteria for the six catalog schemes. Phase 5 adds private saved schemes and source-linked preparation checklists. Phase 6 adds Hindi/English support across those features. Phase 7 adds an explainable grouped scheme shortlist using the same screening rules. Phase 8 consolidates the project and adds a single production server, database readiness checks, repeatable local configuration and automated verification. AI assistance remains skipped. This is an independent project, not an official government service.
+
+## Phase 8: one project, production-ready startup
+
+All phases now live in **`sarkari-saathi-ai` on `main`**. The previous Phase 7 worktree was merged and removed; Git retains its history and branch. The latest local database and authentication configuration were preserved. There is one project folder, with `client`, `server`, `shared`, tests and documentation together.
+
+Run `npm ci`, `npm run setup`, `npm run build`, then **`npm start`**. Production startup serves the React build and `/api` on one origin, locally **http://localhost:5176**. No Vite preview or second API process is needed. Setup creates missing ignored environments with a random secret and preserves existing files. It does not start MongoDB, seed data, replace settings or deploy the application. Run `npm run seed:schemes` once for the reviewed catalog.
+
+`/api/health` keeps its exact original liveness contract. `/api/ready` additionally verifies a live MongoDB ping and returns a safe 503 during disconnection/draining. Data routes fail promptly while the database is disconnected. API responses are not cached; HTML revalidates, while fingerprinted build assets can be cached immutably. Frontend assets negotiate compression; private API/token responses bypass that middleware. SPA deep links work without turning missing APIs, assets or private files into HTML. Startup validates exact origins, placeholder secrets, positive JWT lifetimes and HTTPS for remote production origins. Graceful shutdown drains HTTP traffic before disconnecting MongoDB, with a bounded deadline.
+
+The read-only [GitHub verification workflow](.github/workflows/verify.yml) installs locked dependencies, runs API/domain/environment/lifecycle tests, builds the frontend and exercises a real production browser/API/database flow with an ephemeral CI secret and MongoDB service. It does not deploy or write to repository contents. See [deployment and recovery](docs/DEPLOYMENT.md) and [Phase 8 verification](docs/PHASE8-VERIFICATION.md) for measured results and operational limits.
 
 ## Screenshots
 
@@ -20,7 +30,7 @@ Filter by category or checked status. Full-catalog counts stay visible independe
 
 This is a partial new-application screen, not a recommendation to apply, verified entitlement, comprehensive directory or government approval. All previous rule boundaries remain: no citizenship/tax/landownership inference, no account-holder-age substitution for a girl, APY birthday/tax clarification, PMSBY provider clarification at 70, and UP stage/family checks. Source/rule review dates remain 8 October 2026; this phase did not rereview official policy. See [Phase 7 verification](docs/PHASE7-VERIFICATION.md).
 
-This phase is isolated in the sibling folder `sarkari-saathi-ai-phase7` on branch `phase-7-shortlist`. The original Phase 6 checkout stays on `main`. The new local frontend uses **5176**, API **5001**, and development database **sarkari_saathi_ai_phase7**, with its own ignored environments and locally generated JWT secret. Both folders share Git history through a worktree; dependencies, runtime ports, browser origins and development data are separate.
+Phase 7 was originally delivered in a separate worktree on `phase-7-shortlist`; Phase 8 consolidated it into this project on `main`. Its local database **sarkari_saathi_ai_phase7** and authentication settings were retained, so existing local accounts and saved preparation data remain available. Earlier verification records describe their original folders/ports and are historical evidence.
 
 Implementation: `shared/discovery.js` defines transparent grouping and safe view parsing; `useDiscovery` owns page-local answers and confirmation state; `Discovery` composes the existing assessment/question UI. GET/POST `/api/eligibility` are reused unchanged. No new endpoint, request schema, secret setting or migration is required. The existing 55-request Postman collection remains applicable; browser tests execute the live profile → screening → grouped view → preparation flow.
 
@@ -125,56 +135,58 @@ New reusable pieces: WorkspaceLayout, SelectField, ProfileProgress, LeaveProfile
 
 ## Run locally
 
-Requirements: Node.js 22.12+ (verified environment: Node 24), npm, and a running local MongoDB service. Run commands from `sarkari-saathi-ai-phase7`.
+Requirements: Node.js 22.12+ (verified environment: Node 24), npm, and a running local MongoDB service. Run commands from `sarkari-saathi-ai`.
 
 ```powershell
-npm install
-# Environment files are already configured locally for this delivery.
-# For a fresh checkout:
-Copy-Item server/.env.example server/.env
-Copy-Item client/.env.example client/.env
-# Replace JWT_SECRET with a cryptographically random secret, at least 32 characters.
+npm ci
+npm run setup
 npm run seed:schemes
-npm run dev
+npm run build
+npm start
 ```
 
-**This isolated Phase 7 delivery runs at http://localhost:5176**, with API health at http://localhost:5001/api/health. The original Phase 6 folder retains ports 5175/5000. Examples default to 5173/5000 for a fresh checkout. The API and production preview are left running for manual testing.
+**This consolidated delivery runs at http://localhost:5176**, with API health at http://localhost:5176/api/health and readiness at http://localhost:5176/api/ready. The production server is left running for manual testing. The optional development pair defaults to 5173/5000 on a fresh setup; the preserved local development settings use 5176/5001. Stop the production server before starting Vite on the same frontend port.
 
-Changing the frontend port requires updating both `VITE_DEV_PORT` in `client/.env` and `CLIENT_URL` in `server/.env`, then restarting both processes. Open the browser using `localhost` to match the exact CORS origin.
+Production configuration comes from host environment variables or ignored `server/.env.production`. Set `PORT` and `CLIENT_URL` together for a different local production origin. Development port changes use `VITE_DEV_PORT` in `client/.env` and `CLIENT_URL` in `server/.env`. Open the browser using `localhost` to match the exact origin.
 
-Separate terminals:
+Optional development servers, in separate terminals:
 
 ```powershell
 npm run dev -w server
 npm run dev -w client
 ```
 
-Production frontend check:
+Production startup and readiness check:
 
 ```powershell
 npm run build
-npm run preview -w client
+npm start
+# In another terminal:
+npm run check:health
 ```
 
 ## Environment configuration
 
-| Location    | Variable       | Example default / purpose                             |
-| ----------- | -------------- | ----------------------------------------------------- |
-| server/.env | PORT           | 5000                                                  |
-| server/.env | MONGO_URI      | mongodb://127.0.0.1:27017/sarkari_saathi_ai           |
-| server/.env | JWT_SECRET     | Random private secret; never commit                   |
-| server/.env | JWT_EXPIRES_IN | 7d; accepts integer with s, m, h, or d suffix         |
-| server/.env | CLIENT_URL     | http://localhost:5173; exact allowed browser origin   |
-| server/.env | NODE_ENV       | development, production, or test                      |
-| client/.env | VITE_API_URL   | http://localhost:5000/api; public URL, never a secret |
-| client/.env | VITE_DEV_PORT  | 5173 by default; configured locally as 5176           |
+| Location    | Variable       | Example default / purpose                                    |
+| ----------- | -------------- | ------------------------------------------------------------ |
+| server/.env | PORT           | 5000                                                         |
+| server/.env | MONGO_URI      | mongodb://127.0.0.1:27017/sarkari_saathi_ai                  |
+| server/.env | JWT_SECRET     | Random private secret; never commit                          |
+| server/.env | JWT_EXPIRES_IN | 7d; accepts integer with s, m, h, or d suffix                |
+| server/.env | CLIENT_URL     | http://localhost:5173; exact allowed browser origin          |
+| server/.env | NODE_ENV       | development, production, or test                             |
+| server/.env | SERVE_CLIENT   | false for API-only development; production start forces true |
+| client/.env | VITE_API_URL   | http://localhost:5000/api; public URL, never a secret        |
+| client/.env | VITE_DEV_PORT  | 5173 by default; configured locally as 5176                  |
 
 The `.gitignore` excludes actual environment files, dependencies, build output, and generated reports. Examples are safe to commit. Do not replace the examples with live credentials. Use `localhost` consistently when opening the frontend because the API allowlist is exact.
+
+`server/.env.production.example` documents production variables. `npm run setup` generates the actual file for local use; host-provided values take precedence. `npm start` forces production mode and serving the built client. `VITE_API_URL` defaults to `/api` in production regardless of development `.env`; an explicit build-shell `VITE_API_URL` supports a separate API origin. Development and preview proxy relative `/api` requests to the development API. Never put secrets in Vite variables.
 
 ## Architecture and folder structure
 
 ```text
-sarkari-saathi-ai-phase7/
+sarkari-saathi-ai/
   client/
     public/favicon.svg
     src/
@@ -201,19 +213,22 @@ sarkari-saathi-ai-phase7/
     package.json
   server/
     src/
-      config/       # db.js, env.js
+      config/       # db.js, env.js, environment.js validation
       controllers/ # auth, profile, scheme, eligibility and readiness controllers
       domain/       # eligibility.js screening rules; readiness.js preparation templates
       data/schemes.js # Reviewed editorial catalog with source URLs
-      middleware/   # authMiddleware.js, errorMiddleware.js
+      middleware/   # auth, errors, database availability, production client serving
       models/       # User.js, Profile.js, Scheme.js, SavedScheme.js
       routes/       # auth, profile, scheme, eligibility and readiness routes
       utils/        # generateToken.js, seedSchemes.js
       app.js
+      lifecycle.js
     scripts/seed-schemes.js
     tests/          # auth, profile, schemes, eligibility and readiness *.test.js
     server.js
+    production.js
     .env.example
+    .env.production.example
     package.json
   shared/profile.js
   shared/schemes.js
@@ -225,7 +240,12 @@ sarkari-saathi-ai-phase7/
   scripts/audit-phase5.mjs
   scripts/audit-phase6.mjs
   scripts/audit-phase7.mjs
+  scripts/audit-phase8.mjs
   scripts/capture-screenshots.mjs
+  scripts/setup-local.mjs
+  scripts/check-health.mjs
+  .github/workflows/verify.yml
+  Procfile
   docs/
     SarkariSaathi.postman_collection.json
     VERIFICATION.md
@@ -239,6 +259,8 @@ sarkari-saathi-ai-phase7/
     I18N.md
     PHASE6-VERIFICATION.md
     PHASE7-VERIFICATION.md
+    PHASE8-VERIFICATION.md
+    DEPLOYMENT.md
     screenshots/    # Ten pages, English/Hindi, desktop/mobile
   package.json
   package-lock.json
@@ -251,18 +273,19 @@ User records contain name, normalized email, bcrypt password hash, and timestamp
 
 Frontend: React/React DOM for UI, Vite and its React plugin for development/build, React Router for routing, Tailwind CSS and its Vite plugin for utilities, Axios for centralized requests, Lucide React for consistent tree-shaken icons, Sonner for accessible notifications, and Fontsource Manrope/Noto Sans Devanagari for self-hosted Latin/Hindi fonts. Custom CSS supplies shared tokens, responsive layouts, and lightweight motion; no animation or runtime translation library is needed.
 
-Backend: Express 5 for asynchronous HTTP handlers, Mongoose for MongoDB models, bcrypt for password hashing, jsonwebtoken for HS256 bearer sessions, dotenv for local configuration, Zod for validation, Helmet for HTTP security headers, cors for an explicit origin allowlist, and express-rate-limit for authentication and protected mutation throttling.
+Backend: Express 5 for asynchronous HTTP handlers, Mongoose for MongoDB models, bcrypt for password hashing, jsonwebtoken for HS256 bearer sessions, dotenv for local configuration, Zod for validation, Helmet for HTTP security headers, cors for an explicit origin allowlist, express-rate-limit for authentication and protected mutation throttling, and compression for negotiated frontend asset encoding.
 
 Development: concurrently runs frontend/backend together, Node's test runner with Supertest exercises HTTP/database behavior, Playwright verifies real browser flows, Lighthouse audits the production build, and Prettier formats source. The lockfile records installed versions. A shell-quote 1.11.0 override resolves the development runner's critical advisory; npm audit reports zero vulnerabilities.
 
 ## API contract
 
-| Method | Endpoint           | Result                                                           |
-| ------ | ------------------ | ---------------------------------------------------------------- |
-| GET    | /api/health        | 200 `{ success: true, message: "SarkariSaathi API is running" }` |
-| POST   | /api/auth/register | 201 `{ success: true, user, token }`                             |
-| POST   | /api/auth/login    | 200 `{ success: true, user, token }`                             |
-| GET    | /api/auth/me       | 200 `{ success: true, user }`; bearer JWT required               |
+| Method | Endpoint           | Result                                                                                                    |
+| ------ | ------------------ | --------------------------------------------------------------------------------------------------------- |
+| GET    | /api/health        | 200 `{ success: true, message: "SarkariSaathi API is running" }`                                          |
+| GET    | /api/ready         | 200 `{ success: true, message: "SarkariSaathi API is ready" }`; safe 503 if database unavailable/draining |
+| POST   | /api/auth/register | 201 `{ success: true, user, token }`                                                                      |
+| POST   | /api/auth/login    | 200 `{ success: true, user, token }`                                                                      |
+| GET    | /api/auth/me       | 200 `{ success: true, user }`; bearer JWT required                                                        |
 
 Register body: `{ "name": "Devansh", "email": "devansh@example.com", "password": "password123" }`. Login uses email/password. User response fields: `id`, `name`, `email`, `createdAt`, `updatedAt`. Errors: `{ success: false, message }`; validation 400, rejected session/credentials 401, disallowed origin 403, not found 404, duplicate email 409, oversized body 413, authentication throttling 429, unexpected error 500.
 
@@ -280,7 +303,9 @@ Native smooth anchors, IntersectionObserver reveals, approximately 200ms page en
 
 ```powershell
 npm test
-# Start the API and frontend first, then:
+# With npm start running, configure older helpers before running the suites:
+$env:API_URL = 'http://localhost:5176/api'
+$env:FRONTEND_URL = 'http://localhost:5176'
 npm run test:browser
 npm run test:profile-browser
 npm run test:schemes-browser
@@ -288,15 +313,16 @@ npm run test:eligibility-browser
 npm run test:readiness-browser
 npm run test:language-browser
 npm run test:discovery-browser
-# Production frontend build and running API/preview required:
-npm run audit:phase7
+# Running single production server required:
+npm run test:production-browser
+npm run audit:phase8
 ```
 
-`npm test` runs the 170 API/domain tests, 23 translation/coverage tests and 18 discovery presentation tests; `npm run test:i18n` runs only localization tests. Backend suites create and remove their own uniquely named test databases, with separate names for auth, profile, scheme, screening and readiness tests. They do not wipe the development database. Browser tests create uniquely named synthetic accounts, profiles and saved schemes in the development database; these remain available for inspection. Browser tests use installed Edge or Chrome; set `BROWSER_PATH` for another Chromium executable. The Phase 7 audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and a persistent browser profile in ignored `reports/`, and preserves storage to reach the private page. It measures the authenticated shortlist in English and Hindi. Run Lighthouse separately from browser suites to avoid competing for CPU.
+`npm test` runs 195 API/domain/environment/lifecycle tests, 23 translation/coverage tests and 18 discovery presentation tests, **236 total**. Backend suites create and remove their own uniquely named test databases; they do not wipe development data. Browser tests create uniquely named synthetic accounts, profiles and saved schemes which remain available for inspection. When running older browser helpers against `npm start`, set `API_URL=http://localhost:5176/api` and `FRONTEND_URL=http://localhost:5176` before all commands. The production browser helper uses the same origin automatically. Local helpers use installed Edge/Chrome (`BROWSER_PATH` override); CI installs Playwright Chromium. The shortlist audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and preserved storage in ignored `reports/`, and measures authenticated English/Hindi pages. Run Lighthouse separately from browser suites to avoid CPU contention.
 
 Import `docs/SarkariSaathi.postman_collection.json` into Postman. Run the 55 requests in order; Health initializes a unique account email, registration/login capture the token, and readiness mutations capture the returned revision/save ID. Assertions check status/error safety. It creates a synthetic account in the configured API database. All request scripts and substituted JSON parse; equivalent HTTP scenarios run through Supertest. Postman desktop itself was not run. Expired-token and production-error scenarios are covered by the automated backend suite.
 
-See [Phase 7 verification](docs/PHASE7-VERIFICATION.md) for current API, localization, browser, responsive, animation and security results, including measured Lighthouse scores and limitations. Earlier verification records are retained. Local audit observations are not a production or real-user performance guarantee.
+See [Phase 8 verification](docs/PHASE8-VERIFICATION.md) for current results. Earlier verification records and their measured Lighthouse scores are retained as historical evidence. Local audit observations are not a production or real-user performance guarantee.
 
 ## Current boundaries and known limitations
 

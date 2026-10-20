@@ -139,7 +139,7 @@ export default function WorkspaceLayout() {
           <TranslationNotice />
           <footer className="dashboard-footer">
             {t("Independent project. Not an official government service.")}
-            <span>{t("SarkariSaathi AI · Phase 07")}</span>
+            <span>{t("SarkariSaathi AI · Phase 08")}</span>
           </footer>
         </div>
       </main>
