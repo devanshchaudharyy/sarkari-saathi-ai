@@ -251,6 +251,12 @@ export default function SchemeDetail() {
                   {t(" in a new tab.")}
                 </small>
               </div>
+              <Button
+                to={`/schemes/${scheme.slug}/documents`}
+                variant="secondary"
+              >
+                {t("Help obtaining documents")}
+              </Button>
               <div className="scheme-independent">
                 <Info size={18} aria-hidden="true" />
                 <h3>{t("Stay informed. Verify first.")}</h3>

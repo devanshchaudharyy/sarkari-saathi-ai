@@ -68,3 +68,7 @@ Verification on 20 October 2026: **325 Node tests** (267 API/domain/environment/
 External SMTP delivery, multi-instance rate limiting, public deployment and email-delivery guarantees are not tested or provided by this local handoff. Earlier measured Lighthouse results remain in the phase verification documents; no new performance score is claimed for these additions. AI/RAG and official application/status integration remain skipped.
 
 Account-controls CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39448450109 . Final form polish clears outdated recovery-field errors when inputs change; browser assertions and refreshed screenshots cover the feedback.
+
+## 7. Document-acquisition guidance
+
+Complete: five partial source-backed guides across three existing schemes, public direct links, preparation integration, explicit unknown fees/validity and optional new Aadhaar enrolment. No private document data is collected. Verified with 333 Node checks, production build and eight new browser scenarios plus 19 preparation regressions, English/Hindi at seven widths. Detailed evidence and constraints are in RELIABILITY.md. Source-review work starts after this commit is pushed.

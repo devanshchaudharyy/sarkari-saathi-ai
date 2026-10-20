@@ -55,3 +55,4 @@ Synthetic test accounts, local production server, 20 October 2026.
 | forgot-password                     | [View](forgot-password-desktop.png)  | [View](forgot-password-mobile.png)  | [View](hi-forgot-password-desktop.png)  | [View](hi-forgot-password-mobile.png)  |
 | reset-password                      | [View](reset-password-desktop.png)   | [View](reset-password-mobile.png)   | [View](hi-reset-password-desktop.png)   | [View](hi-reset-password-mobile.png)   |
 | verify-email                        | [View](verify-email-desktop.png)     | [View](verify-email-mobile.png)     | [View](hi-verify-email-desktop.png)     | [View](hi-verify-email-mobile.png)     |
+| Document-acquisition guides         | [View](document-guides-desktop.png)  | [View](document-guides-mobile.png)  | [View](hi-document-guides-desktop.png)  | [View](hi-document-guides-mobile.png)  |

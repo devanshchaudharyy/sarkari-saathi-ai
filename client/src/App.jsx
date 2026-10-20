@@ -8,6 +8,7 @@ import WorkspaceLayout from "./layouts/WorkspaceLayout";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Loader from "./components/Loader";
+const Documents = lazy(() => import("./pages/Documents"));
 const Account = lazy(() => import("./pages/Account"));
 const AccountLink = lazy(() => import("./pages/AccountLink"));
 const Login = lazy(() => import("./pages/Login"));
@@ -131,6 +132,7 @@ export const router = createBrowserRouter([
             path: "/schemes",
             element: <Schemes />,
           },
+          { path: "/schemes/:slug/documents", element: <Documents /> },
           {
             path: "/schemes/:slug",
             element: <SchemeDetail />,

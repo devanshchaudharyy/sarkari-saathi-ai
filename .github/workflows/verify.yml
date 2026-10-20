@@ -53,6 +53,8 @@ jobs:
         run: npm run test:production-browser
       - name: Additional feature browser flows
         run: npm run test:additions-browser
+      - name: Document guidance and source review browser flows
+        run: npm run test:reliability-browser
       - name: Stop test server
         if: always()
         run: fuser -k 5176/tcp || true

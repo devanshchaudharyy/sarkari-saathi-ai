@@ -123,6 +123,14 @@ export default function ReadinessCard({
                   </span>
                 </label>
                 <p>{t(item.detail)}</p>
+                {item.documentGuideId && (
+                  <Button
+                    to={`/schemes/${entry.slug}/documents?item=${item.documentGuideId}`}
+                    variant="ghost"
+                  >
+                    {t("Help with this document")}
+                  </Button>
+                )}
                 <a
                   href={item.source.url}
                   target="_blank"
@@ -139,6 +147,11 @@ export default function ReadinessCard({
             {t(entry.reviewedAt)} · {t(entry.templateVersion)}
           </small>
         </>
+      )}
+      {entry.available && entry.documentGuideAvailable && (
+        <Button to={`/schemes/${entry.slug}/documents`} variant="secondary">
+          {t("I am missing a document")}
+        </Button>
       )}
       <div className="readiness-card-actions">
         {!entry.saved && entry.available ? (

@@ -1,0 +1,68 @@
+{
+  "info": {
+    "name": "SarkariSaathi document guidance and reliability",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5176/api"
+    }
+  ],
+  "item": [
+    {
+      "name": "Document guides - pmsby",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/schemes/pmsby/documents"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Document guides - pmjjby",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/schemes/pmjjby/documents"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Document guides - pm-jan-dhan-yojana",
+      "request": {
+        "method": "GET",
+        "url": "{{baseUrl}}/schemes/pm-jan-dhan-yojana/documents"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

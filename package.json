@@ -33,7 +33,8 @@
     "test:additions-browser": "node tests/additions-browser.mjs",
     "catalog:role": "npm run catalog:role -w server --",
     "test:comparison": "node --test tests/comparison.test.mjs",
-    "test:plans": "node --test tests/plans.test.mjs"
+    "test:plans": "node --test tests/plans.test.mjs",
+    "test:reliability-browser": "node tests/reliability-browser.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",

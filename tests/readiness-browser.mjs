@@ -8,7 +8,8 @@ const env = await readFile("client/.env", "utf8"),
     `http://localhost:${/^VITE_DEV_PORT=(\d+)/m.exec(env)?.[1] || "5173"}`,
   api =
     process.env.API_URL ||
-    /^VITE_API_URL=(.+)/m.exec(env)?.[1]?.trim() || "http://localhost:5000/api";
+    /^VITE_API_URL=(.+)/m.exec(env)?.[1]?.trim() ||
+    "http://localhost:5000/api";
 const executablePath =
   process.env.BROWSER_PATH ||
   [
@@ -173,7 +174,7 @@ try {
     "Official references, provider next steps and screening transition are usable",
     async () => {
       for (const link of await card()
-        .locator(".readiness-item > a, .readiness-official")
+        .locator(".readiness-item > a[target='_blank'], .readiness-official")
         .all()) {
         const url = new URL(await link.getAttribute("href"));
         assert.equal(url.protocol, "https:");
@@ -298,7 +299,11 @@ try {
           await card().locator('input[type="checkbox"]').count(),
           entry.items.length,
         );
-        for (const link of await card().locator(".readiness-item > a").all()) {
+        const references = card().locator(
+          ".readiness-item > a[target='_blank']",
+        );
+        assert.equal(await references.count(), entry.items.length);
+        for (const link of await references.all()) {
           const url = new URL(await link.getAttribute("href"));
           assert.ok(
             url.hostname.endsWith(".gov.in") ||

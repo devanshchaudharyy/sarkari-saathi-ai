@@ -1,3 +1,4 @@
+import { documentGuideFor } from "./documents.js";
 export const READINESS_VERSION = "2026-10-08.1";
 export const READINESS_REVIEWED_AT = "2026-10-08";
 const ref = (title, url) => ({ title, url });
@@ -198,13 +199,17 @@ export function readinessEntry(scheme, saved) {
     scheme && !scheme.readinessSuspended ? readinessTemplates[slug] : null;
   const versionChanged = !!saved && saved.templateVersion !== READINESS_VERSION;
   const completed = new Set(versionChanged ? [] : saved?.completedIds || []);
+  const guides = scheme ? documentGuideFor(scheme) : { items: [] };
   const items = (template || []).map((i) => ({
     ...i,
+    documentGuideId:
+      guides.items.find((g) => g.checklistItems.includes(i.id))?.id || null,
     completed: completed.has(i.id),
   }));
   const done = items.filter((i) => i.completed).length;
   return {
     slug,
+    documentGuideAvailable: guides.items.length > 0,
     name: scheme?.name || slug,
     acronym: scheme?.acronym || "Unavailable",
     category: scheme?.category || null,
