@@ -7,7 +7,7 @@ Approved sequence: implement, verify and push each addition before starting the 
 3. Reviewed catalog management — complete; verified and pushed before addition 4.
 4. Scheme comparison — complete; verified and pushed before addition 5.
 5. Printable preparation plan — complete; verified and pushed before addition 6.
-6. Account controls — pending.
+6. Account controls — complete; verified and pushed as the final approved addition.
 
 Each delivery records its executed tests and limitations here. Application statuses and progress are personal records, not verified government decisions. No real email is sent during verification.
 
@@ -46,3 +46,23 @@ Verification: 299 Node tests (245 API/domain + 23 localization + 18 shortlist + 
 Choose saved schemes and print or save a PDF through the browser. Confirmed self-marked tasks, partial-guidance notices, source URLs, review dates and template versions remain readable on A4. Name inclusion is optional and off by default; email, profile facts, timelines and reminders are excluded. Selection resets after refresh. Unavailable templates show an honest notice. No server PDF service or file upload is introduced.
 
 Verification: 303 Node tests (245 API/domain + 23 localization + 18 shortlist + 13 comparison + 4 plan), production build and 21 cumulative addition-browser scenarios. Print media hides navigation, controls and notifications; a real two-page PDF was rendered and visually inspected, with no clipped tasks or private email. English/Hindi screens fit seven widths, empty selections disable printing and the print action is wired to the browser. Comparison CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39387853258 .
+
+## 6. Account controls
+
+Password reset, optional email verification, password-confirmed profile deletion and explicitly typed account deletion are available. Local email previews use ignored private files and send nothing externally; SMTP is configurable with required TLS and attachment-access restrictions. Remote preview mode is rejected. Only hashed, expiring, single-use random tokens are stored in MongoDB, resends replace older links, fragments are removed when read and successful reset invalidates previous JWT sessions. Verification confirms email access only. Safe auth DTOs remain unchanged.
+
+Account deletion first disables authentication, then purges owned records through a durable retryable cleanup job. Startup/minute sweeps recover failed cleanup and catch late in-flight writes for 24 hours after completion. Pending jobs cannot purge active accounts; repeat sweeps preserve the original retention deadline. No atomic multi-collection deletion or durable email queue is claimed. Public catalog history retains opaque actor IDs. Profile-only deletion preserves preparation/tracker/reminder records. See ACCOUNT-CONTROLS.md for API, setup, recovery and limitations, plus the separate runnable Postman collection.
+
+Verification on 20 October 2026: **325 Node tests** (267 API/domain/environment/lifecycle + 23 localization + 18 shortlist + 13 comparison + 4 plan), production build, **160 browser scenarios** (122 earlier-phase regressions + 10 production + 28 cumulative additions), and zero unexpected runtime/console errors. The account screens were checked in English/Hindi at 360, 390, 430, 768, 1024, 1280 and 1440 pixels, with committed desktop/mobile screenshots. Tests cover generic reset acknowledgements, validation, rate limits, hashed tokens, expiration, resend/single use/concurrent consumption, password byte limits/whitespace, old-session rejection, explicit verification, unchanged safe DTOs, network failures, loading controls, focus restoration, profile-only retention, owner isolation, disabled account access, failed-cleanup recovery and late-write cleanup. Production dependency audit found zero known vulnerabilities at verification time. Printable-plan CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39445578342 .
+
+### Executed release checklist
+
+- [x] Dedicated local test databases; real browser to API to MongoDB flows.
+- [x] All six additions verified independently and pushed in order.
+- [x] Existing login, persistence, public catalog, screening and preparation regressions passed.
+- [x] Keyboard controls, dialogs, anchors, seven widths and reduced-motion behavior checked.
+- [x] New email links require explicit actions, stay out of API responses/storage and expire independently of TTL sweeps.
+- [x] Local previews only during tests; ignored environments, reports and preview messages excluded from Git.
+- [x] API guide, environment examples, screenshot gallery and Postman request/script syntax verified.
+
+External SMTP delivery, multi-instance rate limiting, public deployment and email-delivery guarantees are not tested or provided by this local handoff. Earlier measured Lighthouse results remain in the phase verification documents; no new performance score is claimed for these additions. AI/RAG and official application/status integration remain skipped.

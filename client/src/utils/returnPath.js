@@ -21,6 +21,7 @@ export function safeReturnPath(value) {
         "/catalog",
         "/compare",
         "/plan",
+        "/account",
       ].includes(url.pathname)
     )
       return "/dashboard";

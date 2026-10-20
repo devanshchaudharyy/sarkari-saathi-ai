@@ -4,6 +4,7 @@ import cors from "cors";
 import helmet from "helmet";
 import { env } from "./config/env.js";
 import authRoutes from "./routes/authRoutes.js";
+import accountRoutes from "./routes/accountRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import schemeRoutes from "./routes/schemeRoutes.js";
 import eligibilityRoutes from "./routes/eligibilityRoutes.js";
@@ -35,6 +36,7 @@ app.get("/api/health", (req, res) =>
 app.get("/api/ready", readiness);
 app.use("/api", requireDatabase);
 app.use("/api/auth", authRoutes);
+app.use("/api/account", accountRoutes);
 app.use("/api/profile", profileRoutes);
 app.use("/api/schemes", schemeRoutes);
 app.use("/api/eligibility", eligibilityRoutes);

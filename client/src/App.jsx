@@ -8,6 +8,8 @@ import WorkspaceLayout from "./layouts/WorkspaceLayout";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Loader from "./components/Loader";
+const Account = lazy(() => import("./pages/Account"));
+const AccountLink = lazy(() => import("./pages/AccountLink"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -42,6 +44,10 @@ function NavigationEffects() {
       "/catalog": "Reviewed scheme catalog",
       "/compare": "Compare schemes",
       "/plan": "Your preparation plan",
+      "/account": "Account and privacy",
+      "/forgot-password": "Forgot your password?",
+      "/reset-password": "Choose a new password",
+      "/verify-email": "Confirm your email",
     };
     document.title = `SarkariSaathi AI — ${t(titles[location.pathname] || (location.pathname.startsWith("/schemes/") ? "Scheme details" : "Page not found"))}`;
     const description = document.querySelector('meta[name="description"]');
@@ -140,6 +146,18 @@ export const router = createBrowserRouter([
         element: <Login />,
       },
       {
+        path: "/forgot-password",
+        element: <AccountLink key="forgot" action="forgot" />,
+      },
+      {
+        path: "/reset-password",
+        element: <AccountLink key="reset" action="reset" />,
+      },
+      {
+        path: "/verify-email",
+        element: <AccountLink key="verify" action="verify" />,
+      },
+      {
         path: "/register",
         element: <Register />,
       },
@@ -154,6 +172,7 @@ export const router = createBrowserRouter([
               { path: "/reminders", element: <Reminders /> },
               { path: "/catalog", element: <CatalogManager /> },
               { path: "/plan", element: <PreparationPlan /> },
+              { path: "/account", element: <Account /> },
               {
                 path: "/dashboard",
                 element: <Dashboard />,

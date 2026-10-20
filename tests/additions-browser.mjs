@@ -6,7 +6,7 @@ import {
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
-import { mkdir, writeFile } from "node:fs/promises";
+import { mkdir, writeFile, readdir, readFile } from "node:fs/promises";
 const base = process.env.FRONTEND_URL || "http://localhost:5176";
 const executablePath =
   process.env.BROWSER_PATH ||
@@ -566,6 +566,354 @@ try {
       );
     },
   );
+
+  async function preview(purpose) {
+    for (let attempt = 0; attempt < 30; attempt++) {
+      const names = await readdir("reports/mail").catch(() => []);
+      const mails = (
+        await Promise.all(
+          names
+            .filter((n) => n.endsWith(".json"))
+            .map(async (n) =>
+              JSON.parse(await readFile("reports/mail/" + n, "utf8")),
+            ),
+        )
+      )
+        .filter((m) => m.to === email && m.purpose === purpose)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+      if (mails[0]) return mails[0].text.match(/https?:\/\/\S+/)[0];
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
+    throw Error("Synthetic account email preview was not written");
+  }
+  async function accountScreens(name) {
+    for (const lang of ["hi", "en"]) {
+      await language(lang);
+      for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
+        await page.setViewportSize({ width, height: 1000 });
+        assert(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth + 1,
+          ),
+        );
+        if ([390, 1440].includes(width)) {
+          await page.evaluate(() => document.fonts.ready);
+          await page.screenshot({
+            path:
+              "reports/" +
+              (lang === "hi" ? "hi-" : "") +
+              name +
+              "-" +
+              (width === 390 ? "mobile" : "desktop") +
+              ".png",
+            fullPage: true,
+          });
+        }
+      }
+    }
+  }
+  let verificationLink, resetLink;
+  const replacement = "New Additions Password 123!";
+  await check(
+    "Account status, local preview warning and verification request work without sending email",
+    async () => {
+      await page.goto(base + "/account");
+      await page.getByText("Email not verified", { exact: true }).waitFor();
+      await page.getByText(/Local preview mode: no email is sent/).waitFor();
+      await accountScreens("account");
+      await page
+        .getByRole("button", { name: "Prepare verification link", exact: true })
+        .click();
+      await page
+        .getByRole("status")
+        .filter({ hasText: "If verification is needed" })
+        .first()
+        .waitFor();
+      verificationLink = await preview("verify");
+    },
+  );
+  await check(
+    "Verification link is removed from URL, requires confirmation and is single use",
+    async () => {
+      await page.goto(verificationLink);
+      await page
+        .getByRole("button", { name: "Confirm email access", exact: true })
+        .waitFor();
+      assert.equal(new URL(page.url()).hash, "");
+      await accountScreens("verify-email");
+      await page
+        .getByRole("button", { name: "Confirm email access", exact: true })
+        .click();
+      await page
+        .getByRole("status")
+        .filter({ hasText: "Email verified." })
+        .waitFor();
+      await page.goto(verificationLink);
+      await page
+        .getByRole("button", { name: "Confirm email access", exact: true })
+        .click();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "invalid or expired" })
+        .waitFor();
+      assert.equal(
+        await page.evaluate(() =>
+          localStorage.getItem("sarkarisaathi.token.v1"),
+        ),
+        token,
+      );
+      await page.goto(base + "/account");
+      await page.getByText("Email verified", { exact: true }).waitFor();
+    },
+  );
+  await check(
+    "Forgot-password form validates and shows a generic result with private local preview",
+    async () => {
+      await page.goto(base + "/forgot-password");
+      await page
+        .getByRole("button", { name: "Prepare reset link", exact: true })
+        .click();
+      await page
+        .getByText("Enter a valid email address.", { exact: true })
+        .waitFor();
+      assert.equal(
+        await page
+          .getByLabel("Email address")
+          .evaluate((el) => el === document.activeElement),
+        true,
+      );
+      await page.getByLabel("Email address").fill(email);
+      await accountScreens("forgot-password");
+      await page
+        .getByRole("button", { name: "Prepare reset link", exact: true })
+        .click();
+      await page
+        .getByRole("status")
+        .filter({ hasText: "If an account matches" })
+        .waitFor();
+      resetLink = await preview("reset");
+    },
+  );
+  await check(
+    "Password reset validates matching passwords, strips the link and invalidates old sessions",
+    async () => {
+      await page.goto(resetLink);
+      await page.getByLabel("New password", { exact: true }).fill(replacement);
+      await page
+        .getByLabel("Confirm new password", { exact: true })
+        .fill("different");
+      await page
+        .getByRole("button", { name: "Save new password", exact: true })
+        .click();
+      await page.getByText("Passwords must match.", { exact: true }).waitFor();
+      await page
+        .getByLabel("Confirm new password", { exact: true })
+        .fill(replacement);
+      assert.equal(new URL(page.url()).hash, "");
+      await page
+        .getByRole("button", { name: "Show password", exact: true })
+        .first()
+        .click();
+      assert.equal(
+        await page
+          .getByLabel("New password", { exact: true })
+          .getAttribute("type"),
+        "text",
+      );
+      await page
+        .getByRole("button", { name: "Hide password", exact: true })
+        .first()
+        .click();
+      await accountScreens("reset-password");
+      let releaseReset;
+      const resetGate = new Promise((resolve) => {
+        releaseReset = resolve;
+      });
+      await page.route("**/api/account/reset-password", async (route) => {
+        await resetGate;
+        await route.continue();
+      });
+      await page
+        .getByRole("button", { name: "Save new password", exact: true })
+        .click();
+      assert.equal(
+        await page
+          .getByRole("button", { name: "Save new password", exact: true })
+          .isDisabled(),
+        true,
+      );
+      assert.equal(
+        await page.getByLabel("New password", { exact: true }).isDisabled(),
+        true,
+      );
+      releaseReset();
+      await page
+        .getByRole("status")
+        .filter({ hasText: "Password changed." })
+        .waitFor();
+      await page.unroute("**/api/account/reset-password");
+      assert.equal(
+        (
+          await context.request.get(base + "/api/auth/me", {
+            headers: { Authorization: "Bearer " + token },
+          })
+        ).status(),
+        401,
+      );
+      await page.goto(base + "/account");
+      await page.waitForURL("**/login");
+      await page.getByLabel("Email address").fill(email);
+      await page.getByLabel("Password", { exact: true }).fill(replacement);
+      await page.getByRole("button", { name: "Sign in", exact: true }).click();
+      await page.waitForURL("**/account");
+      token = await page.evaluate(() =>
+        localStorage.getItem("sarkarisaathi.token.v1"),
+      );
+      await page.goto(resetLink);
+      await page.getByLabel("New password", { exact: true }).fill(replacement);
+      await page
+        .getByLabel("Confirm new password", { exact: true })
+        .fill(replacement);
+      await page
+        .getByRole("button", { name: "Save new password", exact: true })
+        .click();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "invalid or expired" })
+        .waitFor();
+    },
+  );
+  await check(
+    "Network failures preserve a valid account; deletion dialog cancellation restores focus",
+    async () => {
+      await page.goto(base + "/account");
+      await page.getByText("Email verified", { exact: true }).waitFor();
+      await page
+        .getByRole("button", { name: "Delete profile", exact: true })
+        .click();
+      await page.getByRole("dialog").waitFor();
+      await page.keyboard.press("Escape");
+      assert.equal(
+        await page
+          .getByRole("button", { name: "Delete profile", exact: true })
+          .evaluate((el) => el === document.activeElement),
+        true,
+      );
+      await page.route("**/api/account", (route) => route.abort());
+      await page.reload();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: /connect|network|server/i })
+        .waitFor();
+      assert.equal(
+        await page.evaluate(() =>
+          localStorage.getItem("sarkarisaathi.token.v1"),
+        ),
+        token,
+      );
+      await page.unroute("**/api/account");
+      await page
+        .getByRole("button", { name: "Try again", exact: true })
+        .click();
+      await page.getByText("Email verified", { exact: true }).waitFor();
+    },
+  );
+  await check(
+    "Profile deletion checks the current password and preserves saved preparation",
+    async () => {
+      assert.equal(
+        (
+          await context.request.put(base + "/api/profile", {
+            headers: { Authorization: "Bearer " + token },
+            data: {
+              age: 30,
+              state: null,
+              district: "",
+              occupation: null,
+              annualHouseholdIncome: null,
+            },
+          })
+        ).status(),
+        200,
+      );
+      await page
+        .getByRole("button", { name: "Delete profile", exact: true })
+        .click();
+      await page.getByLabel("Current password").fill("wrong");
+      await page
+        .getByRole("button", { name: "Confirm profile deletion", exact: true })
+        .click();
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "current password could not be confirmed" })
+        .waitFor();
+      await page.getByLabel("Current password").fill(replacement);
+      await page
+        .getByRole("button", { name: "Confirm profile deletion", exact: true })
+        .click();
+      await page
+        .getByRole("status")
+        .filter({ hasText: "Profile deleted." })
+        .first()
+        .waitFor();
+      const saved = await context.request.get(base + "/api/readiness", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      assert(saved.ok());
+      assert((await saved.json()).entries.length >= 2);
+      const profile = await context.request.get(base + "/api/profile", {
+        headers: { Authorization: "Bearer " + token },
+      });
+      assert(profile.ok());
+      assert.equal((await profile.json()).profile.age, null);
+    },
+  );
+  await check(
+    "Account deletion requires typed confirmation, clears the session and rejects further login",
+    async () => {
+      await page
+        .getByRole("button", { name: "Delete account", exact: true })
+        .click();
+      await page.getByLabel("Current password").fill(replacement);
+      assert.equal(
+        await page
+          .getByRole("button", {
+            name: "Confirm account deletion",
+            exact: true,
+          })
+          .isDisabled(),
+        true,
+      );
+      await page.getByLabel("Type DELETE to confirm").fill("DELETE");
+      await page
+        .getByRole("button", { name: "Confirm account deletion", exact: true })
+        .click();
+      await page.waitForURL("**/login");
+      assert.equal(
+        await page.evaluate(() =>
+          localStorage.getItem("sarkarisaathi.token.v1"),
+        ),
+        null,
+      );
+      assert.equal(
+        (
+          await context.request.get(base + "/api/auth/me", {
+            headers: { Authorization: "Bearer " + token },
+          })
+        ).status(),
+        401,
+      );
+      assert.equal(
+        (
+          await context.request.post(base + "/api/auth/login", {
+            data: { email, password: replacement },
+          })
+        ).status(),
+        401,
+      );
+    },
+  );
+
   await check("No unexpected runtime or console errors", async () =>
     assert.deepEqual(errors, []),
   );

@@ -98,6 +98,15 @@ export default function WorkspaceLayout() {
             <ListChecks size={19} />
             {t("Reminders")}
           </NavLink>
+          <NavLink
+            to="/account"
+            className={({ isActive }) =>
+              isActive ? "sidebar-active" : "sidebar-link"
+            }
+          >
+            <ShieldCheck size={19} />
+            {t("Account")}
+          </NavLink>
           {["admin", "editor"].includes(staffRole) && (
             <NavLink
               to="/catalog"
@@ -139,21 +148,23 @@ export default function WorkspaceLayout() {
             <span className="breadcrumb">
               /{" "}
               {t(
-                location.pathname === "/catalog"
-                  ? "Manage catalog"
-                  : location.pathname === "/applications"
-                    ? "Applications"
-                    : location.pathname === "/reminders"
-                      ? "Reminders"
-                      : location.pathname === "/profile"
-                        ? "My profile"
-                        : location.pathname === "/eligibility"
-                          ? "Screening"
-                          : location.pathname === "/discover"
-                            ? "My shortlist"
-                            : location.pathname === "/readiness"
-                              ? "Preparation"
-                              : "Overview",
+                location.pathname === "/account"
+                  ? "Account and privacy"
+                  : location.pathname === "/catalog"
+                    ? "Manage catalog"
+                    : location.pathname === "/applications"
+                      ? "Applications"
+                      : location.pathname === "/reminders"
+                        ? "Reminders"
+                        : location.pathname === "/profile"
+                          ? "My profile"
+                          : location.pathname === "/eligibility"
+                            ? "Screening"
+                            : location.pathname === "/discover"
+                              ? "My shortlist"
+                              : location.pathname === "/readiness"
+                                ? "Preparation"
+                                : "Overview",
               )}
             </span>
           </span>

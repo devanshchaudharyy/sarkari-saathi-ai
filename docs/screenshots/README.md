@@ -44,10 +44,14 @@ Checklist completion and screening results are partial, self-reported guidance, 
 
 Synthetic test accounts, local production server, 20 October 2026.
 
-| Page                                | English desktop                    | English mobile                    | Hindi desktop                         | Hindi mobile                         |
-| ----------------------------------- | ---------------------------------- | --------------------------------- | ------------------------------------- | ------------------------------------ |
-| Application tracker                 | [View](applications-desktop.png)   | [View](applications-mobile.png)   | [View](hi-applications-desktop.png)   | [View](hi-applications-mobile.png)   |
-| Personal reminders                  | [View](reminders-desktop.png)      | [View](reminders-mobile.png)      | [View](hi-reminders-desktop.png)      | [View](hi-reminders-mobile.png)      |
-| Catalog editor (private test draft) | [View](catalog-editor-desktop.png) | [View](catalog-editor-mobile.png) | [View](hi-catalog-editor-desktop.png) | [View](hi-catalog-editor-mobile.png) |
-| Scheme comparison                   | [View](comparison-desktop.png)     | [View](comparison-mobile.png)     | [View](hi-comparison-desktop.png)     | [View](hi-comparison-mobile.png)     |
-| Printable preparation plan | [View](preparation-plan-desktop.png) | [View](preparation-plan-mobile.png) | [View](hi-preparation-plan-desktop.png) | [View](hi-preparation-plan-mobile.png) |
+| Page                                | English desktop                      | English mobile                      | Hindi desktop                           | Hindi mobile                           |
+| ----------------------------------- | ------------------------------------ | ----------------------------------- | --------------------------------------- | -------------------------------------- |
+| Application tracker                 | [View](applications-desktop.png)     | [View](applications-mobile.png)     | [View](hi-applications-desktop.png)     | [View](hi-applications-mobile.png)     |
+| Personal reminders                  | [View](reminders-desktop.png)        | [View](reminders-mobile.png)        | [View](hi-reminders-desktop.png)        | [View](hi-reminders-mobile.png)        |
+| Catalog editor (private test draft) | [View](catalog-editor-desktop.png)   | [View](catalog-editor-mobile.png)   | [View](hi-catalog-editor-desktop.png)   | [View](hi-catalog-editor-mobile.png)   |
+| Scheme comparison                   | [View](comparison-desktop.png)       | [View](comparison-mobile.png)       | [View](hi-comparison-desktop.png)       | [View](hi-comparison-mobile.png)       |
+| Printable preparation plan          | [View](preparation-plan-desktop.png) | [View](preparation-plan-mobile.png) | [View](hi-preparation-plan-desktop.png) | [View](hi-preparation-plan-mobile.png) |
+| account                             | [View](account-desktop.png)          | [View](account-mobile.png)          | [View](hi-account-desktop.png)          | [View](hi-account-mobile.png)          |
+| forgot-password                     | [View](forgot-password-desktop.png)  | [View](forgot-password-mobile.png)  | [View](hi-forgot-password-desktop.png)  | [View](hi-forgot-password-mobile.png)  |
+| reset-password                      | [View](reset-password-desktop.png)   | [View](reset-password-mobile.png)   | [View](hi-reset-password-desktop.png)   | [View](hi-reset-password-mobile.png)   |
+| verify-email                        | [View](verify-email-desktop.png)     | [View](verify-email-mobile.png)     | [View](hi-verify-email-desktop.png)     | [View](hi-verify-email-mobile.png)     |

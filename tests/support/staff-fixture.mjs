@@ -32,7 +32,10 @@ export async function staffFixture(email, role) {
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 5000 });
   try {
     const user = await User.findOne({ email });
-    if (!user) throw Error("Synthetic staff account not found.");
+    if (!user) {
+      if (role === "citizen") return;
+      throw Error("Synthetic staff account not found.");
+    }
     await StaffAccess.init();
     if (role === "citizen") await StaffAccess.deleteOne({ user: user._id });
     else

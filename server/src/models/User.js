@@ -16,6 +16,9 @@ const schema = new mongoose.Schema(
       unique: true,
     },
     password: { type: String, required: true, select: false },
+    sessionVersion: { type: Number, default: 0, select: false },
+    emailVerifiedAt: { type: Date, default: null, select: false },
+    deletingAt: { type: Date, default: null, select: false },
   },
   { timestamps: true },
 );

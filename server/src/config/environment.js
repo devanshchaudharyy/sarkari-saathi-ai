@@ -20,6 +20,16 @@ const schema = z.object({
     .regex(/^[1-9]\d*[smhd]$/)
     .default("7d"),
   CLIENT_URL: origin,
+  MAIL_MODE: z.enum(["preview", "smtp", "disabled"]).optional(),
+  SMTP_HOST: z.string().optional(),
+  SMTP_PORT: z.coerce.number().int().min(1).max(65535).default(587),
+  SMTP_SECURE: z
+    .enum(["true", "false"])
+    .default("false")
+    .transform((v) => v === "true"),
+  SMTP_USER: z.string().optional(),
+  SMTP_PASS: z.string().optional(),
+  SMTP_FROM: z.email().optional(),
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
@@ -36,6 +46,19 @@ export function parseEnvironment(input) {
     );
   const env = result.data;
   const url = new URL(env.CLIENT_URL);
+  const loopback = ["localhost", "127.0.0.1", "[::1]"].includes(url.hostname);
+  env.MAIL_MODE ??= loopback ? "preview" : "disabled";
+  if (env.MAIL_MODE === "preview" && !loopback)
+    throw new Error(
+      "Invalid environment configuration: mail previews require a loopback CLIENT_URL",
+    );
+  if (
+    env.MAIL_MODE === "smtp" &&
+    (!env.SMTP_HOST || !env.SMTP_FROM || !env.SMTP_USER || !env.SMTP_PASS)
+  )
+    throw new Error(
+      "Invalid environment configuration: SMTP_HOST, SMTP_FROM, SMTP_USER and SMTP_PASS are required",
+    );
   if (
     env.NODE_ENV === "production" &&
     url.protocol !== "https:" &&

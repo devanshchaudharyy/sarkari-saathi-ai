@@ -25,6 +25,7 @@ jobs:
       FRONTEND_URL: http://localhost:5176
       MONGO_URI: mongodb://127.0.0.1:27017/sarkari_saathi_ci
       JWT_EXPIRES_IN: 1h
+      MAIL_MODE: preview
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

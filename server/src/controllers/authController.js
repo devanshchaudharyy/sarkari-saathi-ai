@@ -3,8 +3,8 @@ import { z } from "zod";
 import User, { safeUser } from "../models/User.js";
 import generateToken from "../utils/generateToken.js";
 import { HttpError } from "../middleware/errorMiddleware.js";
-const email = z.string().trim().toLowerCase().email().max(254);
-const password = z
+export const email = z.string().trim().toLowerCase().email().max(254);
+export const password = z
   .string()
   .min(8, "Password must contain at least 8 characters.")
   .refine(
@@ -42,8 +42,14 @@ export async function register(req, res) {
 }
 export async function login(req, res) {
   const input = validate(loginSchema, req.body);
-  const user = await User.findOne({ email: input.email }).select("+password");
-  if (!user || !(await bcrypt.compare(input.password, user.password)))
+  const user = await User.findOne({ email: input.email }).select(
+    "+password +sessionVersion +deletingAt",
+  );
+  if (
+    !user ||
+    user.deletingAt ||
+    !(await bcrypt.compare(input.password, user.password))
+  )
     throw new HttpError(401, "Invalid email or password");
   res.json({ success: true, user: safeUser(user), token: generateToken(user) });
 }

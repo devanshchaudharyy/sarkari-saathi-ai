@@ -1,0 +1,433 @@
+{
+  "info": {
+    "name": "SarkariSaathi account controls - synthetic account only",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Read ACCOUNT-CONTROLS.md. Preview tokens are private, supplied manually; destructive requests skip unless allowDelete=true."
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5176/api"
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "password",
+      "value": "Postman-account-password!"
+    },
+    {
+      "key": "nextPassword",
+      "value": "Postman-replacement-password!"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "verificationToken",
+      "value": ""
+    },
+    {
+      "key": "resetToken",
+      "value": ""
+    },
+    {
+      "key": "allowDelete",
+      "value": "false"
+    }
+  ],
+  "item": [
+    {
+      "name": "Capabilities and initialize synthetic email",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/account/capabilities"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('email','account.postman.'+Date.now()+'@example.com');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register synthetic account",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/register",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Account\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});",
+              "const d=pm.response.json();if(d.token)pm.collectionVariables.set('token',d.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Private account status",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/account"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prepare verification link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/account/request-verification",
+        "body": {
+          "mode": "raw",
+          "raw": "{}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Confirm manually supplied verification link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/account/verify-email",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{verificationToken}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(!pm.collectionVariables.get('verificationToken'))pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prepare reset link",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/account/request-reset",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reset with manually supplied token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/account/reset-password",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"token\": \"{{resetToken}}\",\n  \"password\": \"{{nextPassword}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(!pm.collectionVariables.get('resetToken'))pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});",
+              "pm.collectionVariables.set('password',pm.collectionVariables.get('nextPassword'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sign in after reset",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/auth/login",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});",
+              "const d=pm.response.json();if(d.token)pm.collectionVariables.set('token',d.token);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete profile - explicit opt in",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/account/profile",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{password}}\",\n  \"confirmed\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.collectionVariables.get('allowDelete')!=='true')pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Delete account - explicit opt in",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/account",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"password\": \"{{password}}\",\n  \"confirmation\": \"DELETE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.collectionVariables.get('allowDelete')!=='true')pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Safe success response',()=>{pm.expect(pm.response.code).to.be.oneOf([200,201,202]);pm.expect(pm.response.json().success).to.eql(true);});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

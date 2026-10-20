@@ -1,4 +1,8 @@
 import StaffAccess from "./src/models/StaffAccess.js";
+import AccountAction from "./src/models/AccountAction.js";
+import AccountDeletion from "./src/models/AccountDeletion.js";
+import { startDeletionWorker } from "./src/services/accountDeletion.js";
+import { flushMail } from "./src/services/mail.js";
 import mongoose from "mongoose";
 import app from "./src/app.js";
 import { env } from "./src/config/env.js";
@@ -22,7 +26,10 @@ try {
     Application.init(),
     Reminder.init(),
     StaffAccess.init(),
+    AccountAction.init(),
+    AccountDeletion.init(),
   ]);
+  const stopWorker = startDeletionWorker();
   const server = app.listen(env.PORT, () =>
     console.log(`SarkariSaathi API ready at http://localhost:${env.PORT}`),
   );
@@ -33,7 +40,11 @@ try {
   const stop = createShutdown({
     app,
     server,
-    disconnect: () => mongoose.disconnect(),
+    disconnect: async () => {
+      await stopWorker();
+      await flushMail();
+      await mongoose.disconnect();
+    },
   });
   process.on("SIGINT", stop);
   process.on("SIGTERM", stop);

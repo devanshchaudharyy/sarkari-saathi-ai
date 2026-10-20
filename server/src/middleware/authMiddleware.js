@@ -14,8 +14,14 @@ export default async function authMiddleware(req, res, next) {
   }
   if (typeof payload !== "object" || !mongoose.isValidObjectId(payload.sub))
     throw new HttpError(401, "Invalid session. Please sign in again.");
-  req.user = await User.findById(payload.sub);
-  if (!req.user)
+  req.user = await User.findById(payload.sub).select(
+    "+sessionVersion +emailVerifiedAt +deletingAt",
+  );
+  if (
+    !req.user ||
+    req.user.deletingAt ||
+    (payload.ver ?? 0) !== (req.user.sessionVersion ?? 0)
+  )
     throw new HttpError(401, "Invalid session. Please sign in again.");
   next();
 }

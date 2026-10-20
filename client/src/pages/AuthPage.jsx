@@ -229,6 +229,7 @@ export default function AuthPage({ register = false }) {
               {!busy ? <ArrowRight size={18} /> : null}
             </Button>
           </form>
+          {!register && <p className="auth-switch"><Link to="/forgot-password">{t("Forgot password?")}</Link></p>}
           <p className="auth-switch">
             {t(register ? "Already have an account?" : "New to SarkariSaathi?")}{" "}
             <Link to={register ? "/login" : "/register"}>

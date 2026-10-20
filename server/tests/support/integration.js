@@ -9,6 +9,7 @@ export async function integration(name) {
     CLIENT_URL: "http://localhost:5176",
     NODE_ENV: "test",
     SERVE_CLIENT: "false",
+    MAIL_MODE: "preview",
   });
   const { default: app } = await import("../../src/app.js");
   const { default: User } = await import("../../src/models/User.js");
