@@ -78,6 +78,8 @@ export default function usePrivateCollection(endpoint) {
             ]
           : current.entries.filter((row) => row.id !== response.data.removedId),
       }));
+      if (endpoint === "/reminders")
+        window.dispatchEvent(new Event("reminders:changed"));
       toast.success(t("Your change is saved."));
       return true;
     } catch (error) {

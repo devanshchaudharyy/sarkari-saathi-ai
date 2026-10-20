@@ -454,7 +454,7 @@ try {
           await page.evaluate(() => document.fonts.ready);
           assert.equal(
             await page.locator(".workspace-navigation a").count(),
-            7,
+            8,
           );
           assert.equal(
             await page.evaluate(

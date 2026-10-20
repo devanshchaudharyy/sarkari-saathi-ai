@@ -5,6 +5,7 @@ import { connectDB } from "./src/config/db.js";
 import User from "./src/models/User.js";
 import Profile from "./src/models/Profile.js";
 import Scheme from "./src/models/Scheme.js";
+import Reminder from "./src/models/Reminder.js";
 import Application from "./src/models/Application.js";
 import SavedScheme from "./src/models/SavedScheme.js";
 import { assertClientBuild } from "./src/middleware/client.js";
@@ -18,6 +19,7 @@ try {
     Scheme.init(),
     SavedScheme.init(),
     Application.init(),
+    Reminder.init(),
   ]);
   const server = app.listen(env.PORT, () =>
     console.log(`SarkariSaathi API ready at http://localhost:${env.PORT}`),

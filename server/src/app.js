@@ -6,6 +6,7 @@ import authRoutes from "./routes/authRoutes.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import schemeRoutes from "./routes/schemeRoutes.js";
 import eligibilityRoutes from "./routes/eligibilityRoutes.js";
+import reminderRoutes from "./routes/reminderRoutes.js";
 import applicationRoutes from "./routes/applicationRoutes.js";
 import readinessRoutes from "./routes/readinessRoutes.js";
 import { HttpError, errorMiddleware } from "./middleware/errorMiddleware.js";
@@ -38,6 +39,7 @@ app.use("/api/schemes", schemeRoutes);
 app.use("/api/eligibility", eligibilityRoutes);
 app.use("/api/readiness", readinessRoutes);
 app.use("/api/applications", applicationRoutes);
+app.use("/api/reminders", reminderRoutes);
 // An API miss must keep its JSON contract even when the client is also served.
 app.use("/api", (req, res, next) =>
   next(new HttpError(404, "Endpoint not found.")),

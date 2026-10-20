@@ -4,7 +4,7 @@ A MERN application for understanding government schemes. Phase 1 provides authen
 
 ## Additional features
 
-[Applications](http://localhost:5176/applications) is a private, user-maintained tracker for preparation, submission and recorded decisions. It is not connected to government status systems. See [incremental feature delivery and verification](docs/ADDITIONS-PROGRESS.md). Each addition is verified and pushed independently.
+[Applications](http://localhost:5176/applications) is a private, user-maintained tracker for preparation, submission and recorded decisions. It is not connected to government status systems. See [incremental feature delivery and verification](docs/ADDITIONS-PROGRESS.md). Each addition is verified and pushed independently. [Personal reminders](http://localhost:5176/reminders) provide in-app due/overdue dates chosen by the citizen, without external messages or official-deadline claims.
 
 ## Phase 8: one project, production-ready startup
 
@@ -324,7 +324,7 @@ npm run audit:phase8
 
 `npm test` runs all API/domain, feature, environment/lifecycle, localization and shortlist tests. Current counts and per-addition verification are in [the delivery log](docs/ADDITIONS-PROGRESS.md). Backend suites create and remove their own uniquely named test databases; they do not wipe development data. Browser tests create uniquely named synthetic accounts, profiles and saved schemes which remain available for inspection. When running older browser helpers against `npm start`, set `API_URL=http://localhost:5176/api` and `FRONTEND_URL=http://localhost:5176` before all commands. The production browser helper uses the same origin automatically. Local helpers use installed Edge/Chrome (`BROWSER_PATH` override); CI installs Playwright Chromium. The shortlist audit defaults to installed Chrome (`CHROME_PATH` override), uses a synthetic account and preserved storage in ignored `reports/`, and measures authenticated English/Hindi pages. Run Lighthouse separately from browser suites to avoid CPU contention.
 
-Import `docs/SarkariSaathi.postman_collection.json` into Postman. Run the 55 requests in order; Health initializes a unique account email, registration/login capture the token, and readiness mutations capture the returned revision/save ID. Assertions check status/error safety. It creates a synthetic account in the configured API database. All request scripts and substituted JSON parse; equivalent HTTP scenarios run through Supertest. Postman desktop itself was not run. Expired-token and production-error scenarios are covered by the automated backend suite.
+Import `docs/SarkariSaathi.postman_collection.json` into Postman. Run the requests in order; Health initializes a unique account email, registration/login capture the token, and readiness mutations capture the returned revision/save ID. Assertions check status/error safety. It creates a synthetic account in the configured API database. All request scripts and substituted JSON parse; equivalent HTTP scenarios run through Supertest. Postman desktop itself was not run. Expired-token and production-error scenarios are covered by the automated backend suite.
 
 See [Phase 8 verification](docs/PHASE8-VERIFICATION.md) for current results. Earlier verification records and their measured Lighthouse scores are retained as historical evidence. Local audit observations are not a production or real-user performance guarantee.
 

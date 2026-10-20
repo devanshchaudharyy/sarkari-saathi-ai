@@ -174,3 +174,30 @@
     animation: none !important;
   }
 }
+.reminder-indicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #5046dd;
+  padding: 8px;
+  border-radius: 8px;
+}
+.reminder-indicator span {
+  font-size: 11px;
+  background: #f6e8dd;
+  color: #853e16;
+  padding: 2px 5px;
+  border-radius: 10px;
+}
+.reminder-overdue {
+  background: #fff0ee;
+  color: #92332c;
+}
+.reminder-today {
+  background: #fff3db;
+  color: #795511;
+}
+.reminder-completed {
+  background: #e6f3e9;
+  color: #245c36;
+}

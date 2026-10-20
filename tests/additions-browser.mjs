@@ -150,6 +150,68 @@ try {
         .waitFor();
     },
   );
+  await check(
+    "Personal reminders show due-today and persist confirmed completion",
+    async () => {
+      await page.goto(base + "/reminders");
+      await page.getByLabel("Reminder scheme").selectOption("pmsby");
+      await page
+        .getByRole("button", { name: "Create reminder", exact: true })
+        .click();
+      await page.locator(".reminder-card .reminder-today").waitFor();
+      await page
+        .getByRole("button", { name: "Mark complete", exact: true })
+        .click();
+      await page.locator(".reminder-card .reminder-completed").waitFor();
+      await page.reload();
+      await page.locator(".reminder-card .reminder-completed").waitFor();
+    },
+  );
+  await check(
+    "Reminders reschedule and filter without inventing a provider deadline",
+    async () => {
+      await page.getByLabel("Reschedule for").fill("2099-01-01");
+      await page.getByRole("button", { name: "Reschedule and reopen" }).click();
+      await page.locator(".reminder-card .reminder-upcoming").waitFor();
+      await page.getByLabel("Show reminders").selectOption("today");
+      await page.getByText("No reminders in this view.").waitFor();
+      await page.getByLabel("Show reminders").selectOption("all");
+      await page.locator(".reminder-card").waitFor();
+    },
+  );
+  await check(
+    "Reminder layouts and translations fit seven widths",
+    async () => {
+      for (const lang of ["hi", "en"]) {
+        await language(lang);
+        for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
+          await page.setViewportSize({ width, height: 1000 });
+          assert(
+            await page.evaluate(
+              () => document.documentElement.scrollWidth <= innerWidth + 1,
+            ),
+          );
+          if ([390, 1440].includes(width)) {
+            await page.evaluate(() => document.fonts.ready);
+            await page.screenshot({
+              path: `reports/${lang === "hi" ? "hi-" : ""}reminders-${width === 390 ? "mobile" : "desktop"}.png`,
+              fullPage: true,
+            });
+          }
+        }
+      }
+    },
+  );
+  await check(
+    "Reminder removal requires confirmation and persists",
+    async () => {
+      await page.getByRole("button", { name: "Remove reminder" }).click();
+      await page.getByRole("button", { name: "Confirm removal" }).click();
+      await page.getByText("No reminders in this view.").waitFor();
+      await page.reload();
+      await page.getByText("No reminders in this view.").waitFor();
+    },
+  );
   await check("No unexpected runtime or console errors", async () =>
     assert.deepEqual(errors, []),
   );

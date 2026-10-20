@@ -11,6 +11,7 @@ import {
   ListChecks,
 } from "lucide-react";
 import Brand from "../components/Brand";
+import ReminderIndicator from "../components/ReminderIndicator";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import TranslationNotice from "../components/TranslationNotice";
 import Button from "../components/Button";
@@ -86,6 +87,15 @@ export default function WorkspaceLayout() {
             <FileCheck2 size={19} />
             {t("Applications")}
           </NavLink>
+          <NavLink
+            to="/reminders"
+            className={({ isActive }) =>
+              isActive ? "sidebar-active" : "sidebar-link"
+            }
+          >
+            <ListChecks size={19} />
+            {t("Reminders")}
+          </NavLink>
         </nav>
         <div className="sidebar-future">
           <span>{t("ON THE HORIZON")}</span>
@@ -116,19 +126,24 @@ export default function WorkspaceLayout() {
             <span className="breadcrumb">
               /{" "}
               {t(
-                location.pathname === "/profile"
-                  ? "My profile"
-                  : location.pathname === "/eligibility"
-                    ? "Screening"
-                    : location.pathname === "/discover"
-                      ? "My shortlist"
-                      : location.pathname === "/readiness"
-                        ? "Preparation"
-                        : "Overview",
+                location.pathname === "/applications"
+                  ? "Applications"
+                  : location.pathname === "/reminders"
+                    ? "Reminders"
+                    : location.pathname === "/profile"
+                      ? "My profile"
+                      : location.pathname === "/eligibility"
+                        ? "Screening"
+                        : location.pathname === "/discover"
+                          ? "My shortlist"
+                          : location.pathname === "/readiness"
+                            ? "Preparation"
+                            : "Overview",
               )}
             </span>
           </span>
           <div className="dashboard-user">
+            <ReminderIndicator />
             <LanguageSwitcher />
             <span className="user-avatar">
               {user.name.charAt(0).toUpperCase()}

@@ -17,6 +17,7 @@ export function safeReturnPath(value) {
         "/readiness",
         "/discover",
         "/applications",
+        "/reminders",
       ].includes(url.pathname)
     )
       return "/dashboard";
