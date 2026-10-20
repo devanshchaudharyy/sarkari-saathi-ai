@@ -52,11 +52,32 @@ The screening suite exposed a scheduling race: results could render before its a
 
 Previous suites cover authentication, profiles, catalog filters/source anchors, screening boundaries, readiness concurrency/errors, Hindi switching and shortlist behavior. The production-specific flow checks cache/security headers and direct routes, real form/API/database round trips, confirmation-based checklist progress, immediate screening-heading focus, Hindi lazy loading under CSP, network recovery, safe login return, and same-origin requests without runtime/CSP errors.
 
-All seven widths remain in scope: **360, 390, 430, 768, 1024, 1280, 1440px**. Existing suites exercise both languages, forms, cards, six-item navigation, expanded questions/reasons, dialogs, focus, keyboard/native anchors and reduced motion. Screenshot and Lighthouse results are recorded after their final production runs below; earlier phase measurements are historical and are not reused as current scores.
+All seven widths were checked: **360, 390, 430, 768, 1024, 1280, 1440px**. Existing suites exercise both languages, forms, cards, six-item navigation, expanded questions/reasons, dialogs, focus, keyboard/native anchors and reduced motion. All **40 screenshots** were regenerated from the final production UI on 20 October with synthetic accounts: ten routes × two languages × desktop/mobile. Desktop dashboard and Hindi mobile shortlist were visually sampled. Earlier phase measurements remain historical and are not reused as current scores.
 
 ## Final run records
 
-Local browser, screenshot and performance runs are being finalized. GitHub-hosted verification will be recorded after the workflow is pushed and executed. This draft does not claim that a committed workflow has already run.
+The actual [GitHub Linux verification run](https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39379385111) **completed successfully** for implementation commit `c1b7ff9b1c3abf24546ff75a609fd35a9d706faa`. Its steps passed locked installation, 236 Node tests, production build, Chromium installation, catalog seeding, real MongoDB readiness, all ten production browser checks and cleanup. This is execution evidence, not merely a committed workflow. The local 122 regression scenarios supplement the ten scenarios run by CI.
+
+Raw local test logs, all eight browser JSON reports, transfer-size measurements and Lighthouse JSON/HTML are retained under ignored `reports/`. Secrets and browser profiles are not published. API tests remove only their dedicated test databases; synthetic browser/audit accounts remain in the selected development database. No required functional, build, browser or CI check is failing or blocked.
+
+## Measured production mobile Lighthouse
+
+Final run: Lighthouse 13, installed headless Chrome, default mobile simulated throttling, one production server, executed separately from browser suites. A synthetic account and persistent default context preserve authentication/language storage (`disableStorageReset: true`). These are local observations with that cache/storage context, not a cold-user or deployed performance guarantee.
+
+| Route / language                   | Performance | Accessibility | Best practices | SEO | FCP  | LCP  | TBT   | CLS |
+| ---------------------------------- | ----------- | ------------- | -------------- | --- | ---- | ---- | ----- | --- |
+| `/` English                        | 92          | 100           | 100            | 100 | 0.7s | 1.1s | 350ms | 0   |
+| `/` Hindi                          | 87          | 100           | 100            | 100 | 0.7s | 1.2s | 500ms | 0   |
+| `/discover` English, authenticated | 96          | 100           | 100            | 63  | 0.7s | 1.2s | 210ms | 0   |
+| `/discover` Hindi, authenticated   | 91          | 100           | 100            | 63  | 0.7s | 1.4s | 380ms | 0   |
+
+Private routes deliberately disallow indexing, accounting for SEO 63. The back/forward-cache diagnostic remains because audit-browser flags disable it. Accessibility 100 does not certify every accessibility behavior or imply every diagnostic passes.
+
+The audit exposed uncompressed static delivery. Negotiated frontend compression now reduces the entry-script HTTP body from **438,213 bytes to 142,012 bytes** with explicit gzip, about **68% fewer transferred bytes**; gzip and Vary behavior are tested. Private API/token responses bypass compression. An earlier uncompressed run scored 93/87/96/92 on the same four routes; the final scores are 92/87/96/91. Compression improved transfer size, and these observations do **not** establish a better Lighthouse score or lower main-thread time.
+
+**Remaining performance optimization:** Hindi landing has 500ms simulated total blocking time; main-thread style/layout work is an identified follow-up profiling target. LCP and layout stability in the measured runs are recorded above. No perfect-performance or real-user latency claim is made. Use `npm run audit:phase8` to reproduce the measurements; runtime conditions can change scores.
+
+**PHASE 8 COMPLETE** for consolidation and the verified single-service production-readiness scope. Public deployment and the operational prerequisites below remain outside this phase.
 
 ## Limits
 
