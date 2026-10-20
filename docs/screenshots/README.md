@@ -39,3 +39,11 @@ To reproduce, start the configured API and frontend, load the six schemes with `
 For Hindi in PowerShell, set `$env:SCREENSHOT_LANGUAGE='hi'` before the command, then `Remove-Item Env:SCREENSHOT_LANGUAGE` afterwards. Hindi captures use the `hi-` filename prefix. The combined gallery contains 40 images covering ten pages, two languages and two viewports. Startup/capture failures close the browser before propagating the error.
 
 Checklist completion and screening results are partial, self-reported guidance, not official approval. SarkariSaathi is an independent project and is not an official government service.
+
+## Additional feature captures
+
+Synthetic test accounts, local production server, 20 October 2026.
+
+| Page | English desktop | English mobile | Hindi desktop | Hindi mobile |
+| --- | --- | --- | --- | --- |
+| Application tracker | [View](applications-desktop.png) | [View](applications-mobile.png) | [View](hi-applications-desktop.png) | [View](hi-applications-mobile.png) |

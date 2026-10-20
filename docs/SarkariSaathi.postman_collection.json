@@ -1600,6 +1600,199 @@
           }
         }
       ]
+    },
+    {
+      "name": "Application tracker (personal, not official)",
+      "item": [
+        {
+          "name": "Start tracking",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/applications/pmsby",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('applicationDay',new Date().toISOString().slice(0,10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Successful safe response',()=>{pm.response.to.have.status(200);pm.expect(pm.response.json().success).to.eql(true);});",
+                  "const e=pm.response.json().entry;if(e){pm.collectionVariables.set('applicationId',e.id);pm.collectionVariables.set('applicationRevision',e.revision);pm.expect(e).not.to.have.property('user');}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List tracked applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/applications"
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('applicationDay',new Date().toISOString().slice(0,10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Successful safe response',()=>{pm.response.to.have.status(200);pm.expect(pm.response.json().success).to.eql(true);});",
+                  "const e=pm.response.json().entry;if(e){pm.collectionVariables.set('applicationId',e.id);pm.collectionVariables.set('applicationRevision',e.revision);pm.expect(e).not.to.have.property('user');}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Record submission",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/applications/pmsby",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":\"{{applicationId}}\",\"revision\":{{applicationRevision}},\"status\":\"submitted\",\"occurredOn\":\"{{applicationDay}}\"}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('applicationDay',new Date().toISOString().slice(0,10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Successful safe response',()=>{pm.response.to.have.status(200);pm.expect(pm.response.json().success).to.eql(true);});",
+                  "const e=pm.response.json().entry;if(e){pm.collectionVariables.set('applicationId',e.id);pm.collectionVariables.set('applicationRevision',e.revision);pm.expect(e).not.to.have.property('user');}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Remove timeline",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "url": "{{baseUrl}}/applications/pmsby",
+            "body": {
+              "mode": "raw",
+              "raw": "{\"id\":\"{{applicationId}}\",\"revision\":{{applicationRevision}}}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.collectionVariables.set('applicationDay',new Date().toISOString().slice(0,10));"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Successful safe response',()=>{pm.response.to.have.status(200);pm.expect(pm.response.json().success).to.eql(true);});",
+                  "const e=pm.response.json().entry;if(e){pm.collectionVariables.set('applicationId',e.id);pm.collectionVariables.set('applicationRevision',e.revision);pm.expect(e).not.to.have.property('user');}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

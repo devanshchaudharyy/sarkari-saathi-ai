@@ -435,7 +435,7 @@ try {
     },
   );
   await check(
-    "Both languages fit seven widths with six navigation entries and expanded questions",
+    "Both languages fit seven widths with workspace navigation entries and expanded questions",
     async () => {
       for (const language of ["en", "hi"]) {
         await page.evaluate(
@@ -454,7 +454,7 @@ try {
           await page.evaluate(() => document.fonts.ready);
           assert.equal(
             await page.locator(".workspace-navigation a").count(),
-            6,
+            7,
           );
           assert.equal(
             await page.evaluate(

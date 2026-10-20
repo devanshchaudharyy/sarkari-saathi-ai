@@ -77,6 +77,15 @@ export default function WorkspaceLayout() {
             <FileCheck2 size={19} />
             {t("Preparation")}
           </NavLink>
+          <NavLink
+            to="/applications"
+            className={({ isActive }) =>
+              isActive ? "sidebar-active" : "sidebar-link"
+            }
+          >
+            <FileCheck2 size={19} />
+            {t("Applications")}
+          </NavLink>
         </nav>
         <div className="sidebar-future">
           <span>{t("ON THE HORIZON")}</span>

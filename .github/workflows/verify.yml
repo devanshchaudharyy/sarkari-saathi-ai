@@ -50,6 +50,8 @@ jobs:
           npm run check:health
       - name: Production browser to API to database flow
         run: npm run test:production-browser
+      - name: Additional feature browser flows
+        run: npm run test:additions-browser
       - name: Stop test server
         if: always()
         run: fuser -k 5176/tcp || true

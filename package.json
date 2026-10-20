@@ -29,7 +29,8 @@
     "screenshots": "node scripts/capture-screenshots.mjs",
     "seed:schemes": "npm run seed:schemes -w server",
     "audit:phase7": "node scripts/audit-phase7.mjs",
-    "audit:phase8": "node scripts/audit-phase8.mjs"
+    "audit:phase8": "node scripts/audit-phase8.mjs",
+    "test:additions-browser": "node tests/additions-browser.mjs"
   },
   "devDependencies": {
     "concurrently": "^9.2.1",
