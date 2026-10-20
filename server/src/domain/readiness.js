@@ -194,7 +194,8 @@ export const readinessTemplates = {
 };
 export function readinessEntry(scheme, saved) {
   const slug = scheme?.slug || saved.slug;
-  const template = scheme ? readinessTemplates[slug] : null;
+  const template =
+    scheme && !scheme.readinessSuspended ? readinessTemplates[slug] : null;
   const versionChanged = !!saved && saved.templateVersion !== READINESS_VERSION;
   const completed = new Set(versionChanged ? [] : saved?.completedIds || []);
   const items = (template || []).map((i) => ({

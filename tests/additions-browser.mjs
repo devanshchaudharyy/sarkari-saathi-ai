@@ -1,3 +1,8 @@
+import { CATALOG_FIELDS } from "../shared/catalog.js";
+import {
+  staffFixture,
+  removeCatalogFixture,
+} from "./support/staff-fixture.mjs";
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
@@ -27,6 +32,7 @@ page.on("console", (message) => {
 const email = `additions.${Date.now()}@example.com`,
   password = "AdditionsTest123!";
 let token;
+const catalogSlug = `browser-review-${Date.now()}`;
 async function check(name, run) {
   await run();
   results.push({ name, status: "passed" });
@@ -212,10 +218,126 @@ try {
       await page.getByText("No reminders in this view.").waitFor();
     },
   );
+  await check("Ordinary accounts cannot enter catalog management", async () => {
+    await page.goto(base + "/catalog");
+    await page
+      .getByRole("heading", { name: "Catalog access is restricted" })
+      .waitFor();
+    const res = await context.request.get(base + "/api/catalog", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    assert.equal(res.status(), 403);
+  });
+  await check(
+    "An editor saves a private draft without changing published content",
+    async () => {
+      await staffFixture(email, "editor");
+      const source = (
+        await (await context.request.get(base + "/api/schemes/pmsby")).json()
+      ).scheme;
+      const fixtureData = {
+        ...Object.fromEntries(CATALOG_FIELDS.map((key) => [key, source[key]])),
+        slug: catalogSlug,
+        keywords: [],
+      };
+      const created = await context.request.post(base + "/api/catalog", {
+        headers: { Authorization: `Bearer ${token}` },
+        data: fixtureData,
+      });
+      assert.equal(created.status(), 201);
+      await page.goto(base + "/catalog");
+      await page.getByLabel("Choose catalog entry").selectOption(catalogSlug);
+      await page
+        .getByRole("form", { name: "Scheme editorial draft" })
+        .waitFor();
+      const original = await page
+        .getByLabel("Plain-language summary")
+        .inputValue();
+      await page.getByLabel("Plain-language summary").fill(original + " ");
+      const saved = page.waitForResponse(
+        (res) =>
+          res.url().endsWith("/api/catalog/" + catalogSlug) &&
+          res.request().method() === "PATCH",
+      );
+      await page.getByRole("button", { name: "Save editorial draft" }).click();
+      assert.equal((await saved).status(), 200);
+      await page.getByRole("button", { name: "Discard saved draft" }).waitFor();
+      assert.equal(
+        await page.getByRole("button", { name: "Publish saved draft" }).count(),
+        0,
+      );
+      const published = (
+        await (await context.request.get(base + "/api/schemes/pmsby")).json()
+      ).scheme;
+      assert.equal(published.summary, original);
+      assert.equal(Boolean(published.screeningSuspended), false);
+      assert.equal(
+        (
+          await context.request.get(base + "/api/schemes/" + catalogSlug)
+        ).status(),
+        404,
+      );
+    },
+  );
+  await check(
+    "Editor form and history fit seven widths in both languages",
+    async () => {
+      for (const lang of ["hi", "en"]) {
+        await language(lang);
+        for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
+          await page.setViewportSize({ width, height: 1000 });
+          assert(
+            await page.evaluate(
+              () => document.documentElement.scrollWidth <= innerWidth + 1,
+            ),
+          );
+          if ([390, 1440].includes(width)) {
+            await page.evaluate(() => document.fonts.ready);
+            await page.screenshot({
+              path: `reports/${lang === "hi" ? "hi-" : ""}catalog-editor-${width === 390 ? "mobile" : "desktop"}.png`,
+              fullPage: true,
+            });
+          }
+        }
+      }
+    },
+  );
+  await check(
+    "Discard preserves public content and revoked roles lose access",
+    async () => {
+      await page.getByRole("button", { name: "Discard saved draft" }).click();
+      await page
+        .getByRole("button", { name: "Discard draft", exact: true })
+        .click();
+      await page.waitForFunction(
+        () =>
+          !Array.from(document.querySelectorAll("button")).some(
+            (el) => el.textContent === "Discard saved draft",
+          ),
+      );
+      await staffFixture(email, "admin");
+      await page.goto(base + "/catalog");
+      await page.getByLabel("Choose catalog entry").selectOption(catalogSlug);
+      await page.getByRole("button", { name: "Publish saved draft" }).waitFor();
+      assert.equal(
+        await page
+          .getByRole("button", { name: "Publish saved draft" })
+          .isDisabled(),
+        true,
+      );
+      await staffFixture(email, "citizen");
+      await page.goto(base + "/catalog");
+      await page
+        .getByRole("heading", { name: "Catalog access is restricted" })
+        .waitFor();
+    },
+  );
   await check("No unexpected runtime or console errors", async () =>
     assert.deepEqual(errors, []),
   );
 } finally {
+  if (token) await staffFixture(email, "citizen");
+  await removeCatalogFixture(catalogSlug);
   await mkdir("reports", { recursive: true });
   await writeFile(
     "reports/additions-browser-results.json",

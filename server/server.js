@@ -1,3 +1,4 @@
+import StaffAccess from "./src/models/StaffAccess.js";
 import mongoose from "mongoose";
 import app from "./src/app.js";
 import { env } from "./src/config/env.js";
@@ -20,6 +21,7 @@ try {
     SavedScheme.init(),
     Application.init(),
     Reminder.init(),
+    StaffAccess.init(),
   ]);
   const server = app.listen(env.PORT, () =>
     console.log(`SarkariSaathi API ready at http://localhost:${env.PORT}`),

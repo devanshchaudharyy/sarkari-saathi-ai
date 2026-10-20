@@ -4,7 +4,7 @@ A MERN application for understanding government schemes. Phase 1 provides authen
 
 ## Additional features
 
-[Applications](http://localhost:5176/applications) is a private, user-maintained tracker for preparation, submission and recorded decisions. It is not connected to government status systems. See [incremental feature delivery and verification](docs/ADDITIONS-PROGRESS.md). Each addition is verified and pushed independently. [Personal reminders](http://localhost:5176/reminders) provide in-app due/overdue dates chosen by the citizen, without external messages or official-deadline claims.
+[Applications](http://localhost:5176/applications) is a private, user-maintained tracker for preparation, submission and recorded decisions. It is not connected to government status systems. See [incremental feature delivery and verification](docs/ADDITIONS-PROGRESS.md). Each addition is verified and pushed independently. [Personal reminders](http://localhost:5176/reminders) provide in-app due/overdue dates chosen by the citizen, without external messages or official-deadline claims. A [staff catalog workspace](http://localhost:5176/catalog) supports private drafts, separate editor/publisher permissions, review dates and change history. Operator access and publication limits are documented in the delivery log.
 
 ## Phase 8: one project, production-ready startup
 

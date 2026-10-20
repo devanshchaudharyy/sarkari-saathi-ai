@@ -1,3 +1,4 @@
+import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { Router } from "express";
 import { rateLimit } from "express-rate-limit";
 import { z } from "zod";
@@ -76,7 +77,7 @@ router.put("/:slug/:kind", async (req, res) => {
       z.strictObject({ dueOn: day.refine((value) => value >= todayInIndia()) }),
       req.body,
     );
-  const scheme = await Scheme.findOne({ slug }).lean();
+  const scheme = await Scheme.findOne({ slug, ...LIVE_CATALOG }).lean();
   if (!scheme)
     throw new HttpError(404, "Scheme not found in the current catalog.");
   let row;

@@ -1,3 +1,4 @@
+import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { z } from "zod";
 import Profile from "../models/Profile.js";
 import Scheme from "../models/Scheme.js";
@@ -28,8 +29,8 @@ async function respond(req, res, answers) {
     Profile.findOne({ user: req.user._id })
       .select("age state annualHouseholdIncome updatedAt -_id")
       .lean(),
-    Scheme.find()
-      .select("slug name acronym category level -_id")
+    Scheme.find(LIVE_CATALOG)
+      .select("slug name acronym category level screeningSuspended -_id")
       .sort({ name: 1, slug: 1 })
       .maxTimeMS(5000)
       .lean(),

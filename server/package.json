@@ -7,7 +7,8 @@
     "start": "node server.js",
     "start:production": "node production.js",
     "test": "node --test tests/*.test.js",
-    "seed:schemes": "node scripts/seed-schemes.js"
+    "seed:schemes": "node scripts/seed-schemes.js",
+    "catalog:role": "node scripts/catalog-role.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",

@@ -11,6 +11,7 @@ import {
   ListChecks,
 } from "lucide-react";
 import Brand from "../components/Brand";
+import useStaffRole from "../hooks/useStaffRole";
 import ReminderIndicator from "../components/ReminderIndicator";
 import LanguageSwitcher from "../components/LanguageSwitcher";
 import TranslationNotice from "../components/TranslationNotice";
@@ -20,6 +21,7 @@ export default function WorkspaceLayout() {
   const { t } = useLanguage();
   const { user, logout } = useAuth();
   const location = useLocation();
+  const staffRole = useStaffRole();
   return (
     <div className="dashboard page-enter">
       <aside className="dashboard-sidebar workspace-sidebar">
@@ -96,6 +98,17 @@ export default function WorkspaceLayout() {
             <ListChecks size={19} />
             {t("Reminders")}
           </NavLink>
+          {["admin", "editor"].includes(staffRole) && (
+            <NavLink
+              to="/catalog"
+              className={({ isActive }) =>
+                isActive ? "sidebar-active" : "sidebar-link"
+              }
+            >
+              <FileCheck2 size={19} />
+              {t("Manage catalog")}
+            </NavLink>
+          )}
         </nav>
         <div className="sidebar-future">
           <span>{t("ON THE HORIZON")}</span>
@@ -126,19 +139,21 @@ export default function WorkspaceLayout() {
             <span className="breadcrumb">
               /{" "}
               {t(
-                location.pathname === "/applications"
-                  ? "Applications"
-                  : location.pathname === "/reminders"
-                    ? "Reminders"
-                    : location.pathname === "/profile"
-                      ? "My profile"
-                      : location.pathname === "/eligibility"
-                        ? "Screening"
-                        : location.pathname === "/discover"
-                          ? "My shortlist"
-                          : location.pathname === "/readiness"
-                            ? "Preparation"
-                            : "Overview",
+                location.pathname === "/catalog"
+                  ? "Manage catalog"
+                  : location.pathname === "/applications"
+                    ? "Applications"
+                    : location.pathname === "/reminders"
+                      ? "Reminders"
+                      : location.pathname === "/profile"
+                        ? "My profile"
+                        : location.pathname === "/eligibility"
+                          ? "Screening"
+                          : location.pathname === "/discover"
+                            ? "My shortlist"
+                            : location.pathname === "/readiness"
+                              ? "Preparation"
+                              : "Overview",
               )}
             </span>
           </span>

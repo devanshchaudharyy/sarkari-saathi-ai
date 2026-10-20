@@ -16,7 +16,7 @@ export async function seedSchemes() {
   for (const record of records)
     await Scheme.updateOne(
       { slug: record.slug },
-      { $set: record },
+      { $setOnInsert: record },
       { upsert: true, runValidators: true },
     );
   return records.length;

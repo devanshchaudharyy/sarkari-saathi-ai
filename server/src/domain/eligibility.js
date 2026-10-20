@@ -499,7 +499,9 @@ const definitions = {
 };
 export function assessSchemes(schemes, profile = {}, answers = {}) {
   return schemes.map((scheme) => {
-    const definition = definitions[scheme.slug];
+    const definition = scheme.screeningSuspended
+      ? null
+      : definitions[scheme.slug];
     const rules = definition?.rules(profile, answers) || [];
     const status = !definition
       ? "not_assessed"

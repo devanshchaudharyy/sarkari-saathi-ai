@@ -7,6 +7,9 @@ export default function ConfirmDialog({
   busy,
   onCancel,
   onConfirm,
+  confirmLabel = "Confirm removal",
+  error = "",
+  confirmDisabled = false,
 }) {
   const ref = useRef(null),
     previous = useRef(document.activeElement),
@@ -32,8 +35,14 @@ export default function ConfirmDialog({
     >
       <h2 id="confirm-title">{t(title)}</h2>
       <div>{children}</div>
+      {error && (
+        <p role="alert" className="organizer-error">
+          {t(error)}
+        </p>
+      )}
       <div className="organizer-actions">
         <Button
+          type="button"
           variant="secondary"
           autoFocus
           disabled={busy}
@@ -41,8 +50,14 @@ export default function ConfirmDialog({
         >
           {t("Cancel")}
         </Button>
-        <Button variant="danger" loading={busy} onClick={onConfirm}>
-          {t("Confirm removal")}
+        <Button
+          type="button"
+          variant="danger"
+          loading={busy}
+          disabled={confirmDisabled}
+          onClick={onConfirm}
+        >
+          {t(confirmLabel)}
         </Button>
       </div>
     </dialog>

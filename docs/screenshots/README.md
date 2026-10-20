@@ -44,8 +44,8 @@ Checklist completion and screening results are partial, self-reported guidance, 
 
 Synthetic test accounts, local production server, 20 October 2026.
 
-| Page                | English desktop                  | English mobile                  | Hindi desktop                       | Hindi mobile                       |
-| ------------------- | -------------------------------- | ------------------------------- | ----------------------------------- | ---------------------------------- |
-| Application tracker | [View](applications-desktop.png) | [View](applications-mobile.png) | [View](hi-applications-desktop.png) | [View](hi-applications-mobile.png) |
-
-| Personal reminders | [View](reminders-desktop.png) | [View](reminders-mobile.png) | [View](hi-reminders-desktop.png) | [View](hi-reminders-mobile.png) |
+| Page                                | English desktop                    | English mobile                    | Hindi desktop                         | Hindi mobile                         |
+| ----------------------------------- | ---------------------------------- | --------------------------------- | ------------------------------------- | ------------------------------------ |
+| Application tracker                 | [View](applications-desktop.png)   | [View](applications-mobile.png)   | [View](hi-applications-desktop.png)   | [View](hi-applications-mobile.png)   |
+| Personal reminders                  | [View](reminders-desktop.png)      | [View](reminders-mobile.png)      | [View](hi-reminders-desktop.png)      | [View](hi-reminders-mobile.png)      |
+| Catalog editor (private test draft) | [View](catalog-editor-desktop.png) | [View](catalog-editor-mobile.png) | [View](hi-catalog-editor-desktop.png) | [View](hi-catalog-editor-mobile.png) |

@@ -1,3 +1,4 @@
+import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { z } from "zod";
 import SavedScheme from "../models/SavedScheme.js";
 import Scheme from "../models/Scheme.js";
@@ -35,7 +36,7 @@ function slug(req) {
   return result.data;
 }
 async function schemeFor(value) {
-  const scheme = await Scheme.findOne({ slug: value }).lean();
+  const scheme = await Scheme.findOne({ slug: value, ...LIVE_CATALOG }).lean();
   if (!scheme)
     throw new HttpError(404, "Scheme not found in the current catalog.");
   return scheme;
@@ -49,7 +50,7 @@ export async function getReadiness(req, res) {
       "This endpoint does not accept filters or account identifiers.",
     );
   const [schemes, saved] = await Promise.all([
-    Scheme.find().sort({ name: 1, slug: 1 }).lean(),
+    Scheme.find(LIVE_CATALOG).sort({ name: 1, slug: 1 }).lean(),
     SavedScheme.find({ user: req.user._id }).lean(),
   ]);
   const bySlug = new Map(saved.map((row) => [row.slug, row]));
@@ -104,7 +105,7 @@ export async function updateReadiness(req, res) {
   const value = slug(req),
     input = parse(updateSchema, req.body),
     scheme = await schemeFor(value);
-  const template = readinessTemplates[value];
+  const template = scheme.readinessSuspended ? null : readinessTemplates[value];
   if (!template?.some((item) => item.id === input.itemId))
     throw new HttpError(
       400,

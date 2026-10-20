@@ -1,3 +1,4 @@
+import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { z } from "zod";
 import Scheme from "../models/Scheme.js";
 import { HttpError } from "../middleware/errorMiddleware.js";
@@ -30,7 +31,7 @@ export async function listSchemes(req, res) {
       "Use valid search and filters. Search is limited to 100 characters; page must be 1–10000 and limit 1–24.",
     );
   const { q, category, level, state, page, limit } = parsed.data;
-  const filter = {};
+  const filter = { ...LIVE_CATALOG };
   if (q)
     filter.searchText = new RegExp(
       q.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"),
@@ -48,7 +49,7 @@ export async function listSchemes(req, res) {
       .maxTimeMS(5000)
       .lean(),
     Scheme.countDocuments(filter).maxTimeMS(5000),
-    Scheme.find()
+    Scheme.find(LIVE_CATALOG)
       .select("-_id category level states reviewedAt")
       .maxTimeMS(5000)
       .lean(),
@@ -91,8 +92,13 @@ export async function getScheme(req, res) {
     req.params.slug.length > 100
   )
     throw new HttpError(404, "Scheme not found in this catalog.");
-  const scheme = await Scheme.findOne({ slug: req.params.slug })
-    .select("-_id -__v -searchText -keywords -createdAt -updatedAt")
+  const scheme = await Scheme.findOne({
+    slug: req.params.slug,
+    ...LIVE_CATALOG,
+  })
+    .select(
+      "slug name acronym category level states authority summary benefitLabel benefitNote benefits eligibility applicationSteps caveats officialUrl sources reviewedAt screeningSuspended -_id",
+    )
     .maxTimeMS(5000)
     .lean();
   if (!scheme) throw new HttpError(404, "Scheme not found in this catalog.");
