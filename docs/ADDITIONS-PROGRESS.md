@@ -66,3 +66,5 @@ Verification on 20 October 2026: **325 Node tests** (267 API/domain/environment/
 - [x] API guide, environment examples, screenshot gallery and Postman request/script syntax verified.
 
 External SMTP delivery, multi-instance rate limiting, public deployment and email-delivery guarantees are not tested or provided by this local handoff. Earlier measured Lighthouse results remain in the phase verification documents; no new performance score is claimed for these additions. AI/RAG and official application/status integration remain skipped.
+
+Account-controls CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39448450109 . Final form polish clears outdated recovery-field errors when inputs change; browser assertions and refreshed screenshots cover the feedback.

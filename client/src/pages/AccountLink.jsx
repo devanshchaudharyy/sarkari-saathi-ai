@@ -103,6 +103,11 @@ export default function AccountLink({ action }) {
       setBusy(false);
     }
   }
+  function edit(setter, key, value) {
+    setter(value);
+    setErrors((previous) => ({ ...previous, [key]: "" }));
+    setError("");
+  }
   return (
     <main
       id="main-content"
@@ -165,7 +170,7 @@ export default function AccountLink({ action }) {
                 autoComplete="email"
                 value={email}
                 maxLength={254}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => edit(setEmail, "email", e.target.value)}
                 error={errors.email}
                 disabled={busy}
               />
@@ -178,7 +183,9 @@ export default function AccountLink({ action }) {
                   type="password"
                   autoComplete="new-password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) =>
+                    edit(setPassword, "password", e.target.value)
+                  }
                   error={errors.password}
                   disabled={busy}
                 />
@@ -188,7 +195,7 @@ export default function AccountLink({ action }) {
                   type="password"
                   autoComplete="new-password"
                   value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
+                  onChange={(e) => edit(setConfirm, "confirm", e.target.value)}
                   error={errors.confirm}
                   disabled={busy}
                 />

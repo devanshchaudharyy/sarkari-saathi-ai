@@ -683,6 +683,12 @@ try {
         true,
       );
       await page.getByLabel("Email address").fill(email);
+      assert.equal(
+        await page
+          .getByText("Enter a valid email address.", { exact: true })
+          .count(),
+        0,
+      );
       await accountScreens("forgot-password");
       await page
         .getByRole("button", { name: "Prepare reset link", exact: true })
@@ -709,6 +715,10 @@ try {
       await page
         .getByLabel("Confirm new password", { exact: true })
         .fill(replacement);
+      assert.equal(
+        await page.getByText("Passwords must match.", { exact: true }).count(),
+        0,
+      );
       assert.equal(new URL(page.url()).hash, "");
       await page
         .getByRole("button", { name: "Show password", exact: true })
