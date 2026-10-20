@@ -66,6 +66,11 @@ export default function Schemes() {
       tabIndex={-1}
       className="catalog-page container page-enter"
     >
+      <div className="organizer-actions">
+        <Button to="/compare" variant="secondary">
+          {t("Compare schemes")}
+        </Button>
+      </div>
       <section className="catalog-intro">
         <div>
           <span className="eyebrow">

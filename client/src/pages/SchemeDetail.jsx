@@ -118,7 +118,16 @@ export default function SchemeDetail() {
               {t(scheme.name)}
             </h1>
             <p>{t(scheme.summary)}</p>
-            {scheme.screeningSuspended && <p role="note" className="organizer-notice">{t("This content was republished. Screening and preparation templates await a separate review; use the official sources for current requirements.")}</p>}
+            <Button to={`/compare?schemes=${scheme.slug}`} variant="secondary">
+              {t("Compare this scheme")}
+            </Button>
+            {scheme.screeningSuspended && (
+              <p role="note" className="organizer-notice">
+                {t(
+                  "This content was republished. Screening and preparation templates await a separate review; use the official sources for current requirements.",
+                )}
+              </p>
+            )}
             <div className="scheme-detail-meta">
               <span>
                 <MapPin size={15} aria-hidden="true" />{" "}

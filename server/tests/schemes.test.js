@@ -233,3 +233,14 @@ test("seed validation rejects untrusted URL protocols", async () => {
     { name: "ValidationError" },
   );
 });
+
+test("public preparation previews contain reviewed guidance without private marks or account metadata", async () => {
+  const { body } = await request(app).get("/api/schemes/pmsby").expect(200);
+  assert.ok(body.scheme.preparation.items.length);
+  for (const item of body.scheme.preparation.items) {
+    assert.equal(item.completed, undefined);
+    assert.equal(item.user, undefined);
+    assert.equal(item.revision, undefined);
+    assert.ok(item.source.url.startsWith("https://"));
+  }
+});

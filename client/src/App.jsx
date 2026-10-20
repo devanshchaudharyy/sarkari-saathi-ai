@@ -16,6 +16,7 @@ const Schemes = lazy(() => import("./pages/Schemes"));
 const SchemeDetail = lazy(() => import("./pages/SchemeDetail"));
 const Eligibility = lazy(() => import("./pages/Eligibility"));
 const Readiness = lazy(() => import("./pages/Readiness"));
+const Compare = lazy(() => import("./pages/Compare"));
 const CatalogManager = lazy(() => import("./pages/CatalogManager"));
 const Reminders = lazy(() => import("./pages/Reminders"));
 const Applications = lazy(() => import("./pages/Applications"));
@@ -38,6 +39,7 @@ function NavigationEffects() {
       "/applications": "Your applications",
       "/reminders": "Your reminders",
       "/catalog": "Reviewed scheme catalog",
+      "/compare": "Compare schemes",
     };
     document.title = `SarkariSaathi AI — ${t(titles[location.pathname] || (location.pathname.startsWith("/schemes/") ? "Scheme details" : "Page not found"))}`;
     const description = document.querySelector('meta[name="description"]');
@@ -112,6 +114,10 @@ export const router = createBrowserRouter([
           {
             path: "/",
             element: <Home />,
+          },
+          {
+            path: "/compare",
+            element: <Compare />,
           },
           {
             path: "/schemes",

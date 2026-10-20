@@ -1,3 +1,4 @@
+import { readinessEntry } from "../domain/readiness.js";
 import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { z } from "zod";
 import Scheme from "../models/Scheme.js";
@@ -97,10 +98,22 @@ export async function getScheme(req, res) {
     ...LIVE_CATALOG,
   })
     .select(
-      "slug name acronym category level states authority summary benefitLabel benefitNote benefits eligibility applicationSteps caveats officialUrl sources reviewedAt screeningSuspended -_id",
+      "slug name acronym category level states authority summary benefitLabel benefitNote benefits eligibility applicationSteps caveats officialUrl sources reviewedAt screeningSuspended readinessSuspended -_id",
     )
     .maxTimeMS(5000)
     .lean();
   if (!scheme) throw new HttpError(404, "Scheme not found in this catalog.");
+  const preview = readinessEntry(scheme, null);
+  scheme.preparation = {
+    reviewedAt: preview.reviewedAt,
+    templateVersion: preview.templateVersion,
+    items: preview.items.map(({ title, detail, kind, source }) => ({
+      title,
+      detail,
+      kind,
+      source,
+    })),
+  };
+  delete scheme.readinessSuspended;
   res.set("Cache-Control", "no-store").json({ success: true, scheme });
 }

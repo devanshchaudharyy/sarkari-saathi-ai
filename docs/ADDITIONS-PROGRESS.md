@@ -5,7 +5,7 @@ Approved sequence: implement, verify and push each addition before starting the 
 1. Application tracker — complete; verified and pushed before addition 2.
 2. Personal reminders — complete; verified and pushed before addition 3.
 3. Reviewed catalog management — complete; verified and pushed before addition 4.
-4. Scheme comparison — pending.
+4. Scheme comparison — complete; verified and pushed before addition 5.
 5. Printable preparation plan — pending.
 6. Account controls — pending.
 
@@ -34,3 +34,9 @@ Verification: 285 Node tests (244 API/domain + 23 localization + 18 shortlist), 
 ### Grant or revoke editorial access
 
 Register an account, then have the trusted local operator run `npm run catalog:role -- --email existing@example.com --role editor` (or `admin`; `citizen` revokes access). This uses server environment/database configuration and never creates an account. Reload the workspace to see the management link. For a hosted database, configure the intended host variables first. No public bootstrap/admin-registration endpoint exists.
+
+## 4. Scheme comparison
+
+Public comparison of two or three live catalog entries: benefits, coverage, eligibility notes, partial document preparation guidance, application steps, source review dates, limitations and official links. Chosen column order is preserved, not ranked. Scheme-only URLs can be shared; invalid, repeated, duplicate or unavailable choices show a safe recovery state. Visitors make no private screening call. Signed-in users may view the existing saved-profile-only screen and missing-fact counts; per-visit answers are never imported or put in URLs. Safe sign-in return retains the comparison. Public preparation previews contain guidance only, never saved task marks or account metadata.
+
+Verification: 299 Node tests (245 API/domain + 23 localization + 18 shortlist + 13 comparison), production build and 18 cumulative addition-browser scenarios. Browser coverage includes two/three columns, direct refresh, invalid choices, protected-report failure while public facts stay visible, anonymous access, sign-in return, exact source links, English/Hindi, seven widths and no unexpected errors. Catalog CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39386376392 .

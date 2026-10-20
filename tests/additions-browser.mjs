@@ -332,6 +332,109 @@ try {
         .waitFor();
     },
   );
+  await check(
+    "Comparison loads two schemes with public sources and profile-only screening",
+    async () => {
+      await page.goto(base + "/compare?schemes=pmsby,pmjjby");
+      await page.locator(".comparison-card").first().waitFor();
+      assert.equal(await page.locator(".comparison-card").count(), 2);
+      await page.locator(".comparison-profile-grid").waitFor();
+      assert.equal(
+        await page.locator(".comparison-profile-grid>div").count(),
+        2,
+      );
+      for (const url of await page
+        .locator(".comparison-card a[target=_blank]")
+        .evaluateAll((links) => links.map((link) => link.href)))
+        assert.equal(new URL(url).protocol, "https:");
+      await page
+        .getByLabel("Scheme 3", { exact: true })
+        .selectOption("pm-kisan");
+      await page.waitForFunction(
+        () => document.querySelectorAll(".comparison-card").length === 3,
+      );
+      await page.reload();
+      await page.waitForFunction(
+        () => document.querySelectorAll(".comparison-card").length === 3,
+      );
+    },
+  );
+  await check(
+    "Invalid comparison choices recover and network failure keeps scheme information",
+    async () => {
+      await page.goto(base + "/compare?schemes=pmsby,pmsby");
+      await page
+        .getByRole("alert")
+        .filter({ hasText: "Some comparison choices" })
+        .waitFor();
+      assert.equal(await page.locator(".comparison-card").count(), 0);
+      await page.getByLabel("Scheme 1", { exact: true }).selectOption("pmsby");
+      await page.getByLabel("Scheme 2", { exact: true }).selectOption("pmjjby");
+      await page.waitForFunction(
+        () => document.querySelectorAll(".comparison-card").length === 2,
+      );
+      await page.route("**/api/eligibility", (route) => route.abort());
+      await page.reload();
+      await page.locator(".profile-comparison [role=alert]").waitFor();
+      assert.equal(await page.locator(".comparison-card").count(), 2);
+      await page.unroute("**/api/eligibility");
+      await page.getByRole("button", { name: "Reload profile screen" }).click();
+      await page.locator(".comparison-profile-grid").waitFor();
+    },
+  );
+  await check("Comparison fits seven widths in both languages", async () => {
+    for (const lang of ["hi", "en"]) {
+      await language(lang);
+      for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
+        await page.setViewportSize({ width, height: 1000 });
+        assert(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth + 1,
+          ),
+        );
+        if ([390, 1440].includes(width)) {
+          await page.evaluate(() => document.fonts.ready);
+          await page.screenshot({
+            path: `reports/${lang === "hi" ? "hi-" : ""}comparison-${width === 390 ? "mobile" : "desktop"}.png`,
+            fullPage: true,
+          });
+        }
+      }
+    }
+  });
+  await check(
+    "Visitors can compare without requesting private screening",
+    async () => {
+      const visitor = await browser.newContext(),
+        tab = await visitor.newPage(),
+        privateCalls = [];
+      tab.on("request", (req) => {
+        if (req.url().includes("/api/eligibility"))
+          privateCalls.push(req.url());
+      });
+      await tab.goto(base + "/compare?schemes=pmsby,pmjjby");
+      await tab.waitForFunction(
+        () => document.querySelectorAll(".comparison-card").length === 2,
+      );
+      await tab
+        .getByText(
+          "Sign in to compare profile-based screening. Public scheme information remains available without an account.",
+        )
+        .waitFor();
+      assert.deepEqual(privateCalls, []);
+      await tab.getByRole("link", { name: "Sign in", exact: true }).click();
+      await tab.getByLabel("Email address").fill(email);
+      await tab.getByLabel("Password", { exact: true }).fill(password);
+      await tab.getByRole("button", { name: "Sign in", exact: true }).click();
+      await tab.waitForURL(
+        (url) =>
+          url.pathname === "/compare" &&
+          url.searchParams.get("schemes") === "pmsby,pmjjby",
+      );
+      await tab.locator(".comparison-profile-grid").waitFor();
+      await visitor.close();
+    },
+  );
   await check("No unexpected runtime or console errors", async () =>
     assert.deepEqual(errors, []),
   );
