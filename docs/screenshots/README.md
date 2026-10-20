@@ -50,3 +50,4 @@ Synthetic test accounts, local production server, 20 October 2026.
 | Personal reminders                  | [View](reminders-desktop.png)      | [View](reminders-mobile.png)      | [View](hi-reminders-desktop.png)      | [View](hi-reminders-mobile.png)      |
 | Catalog editor (private test draft) | [View](catalog-editor-desktop.png) | [View](catalog-editor-mobile.png) | [View](hi-catalog-editor-desktop.png) | [View](hi-catalog-editor-mobile.png) |
 | Scheme comparison                   | [View](comparison-desktop.png)     | [View](comparison-mobile.png)     | [View](hi-comparison-desktop.png)     | [View](hi-comparison-mobile.png)     |
+| Printable preparation plan | [View](preparation-plan-desktop.png) | [View](preparation-plan-mobile.png) | [View](hi-preparation-plan-desktop.png) | [View](hi-preparation-plan-mobile.png) |

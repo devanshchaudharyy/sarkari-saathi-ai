@@ -435,6 +435,137 @@ try {
       await visitor.close();
     },
   );
+  await check(
+    "Preparation plan shows only selected saved schemes and confirmed marks",
+    async () => {
+      const headers = { Authorization: `Bearer ${token}` };
+      for (const slug of ["pmsby", "pmjjby"]) {
+        const saved = await context.request.put(
+          base + "/api/readiness/" + slug,
+          { headers, data: {} },
+        );
+        assert.equal(saved.status(), 200);
+        if (slug === "pmsby") {
+          const entry = (await saved.json()).entry;
+          assert.equal(
+            (
+              await context.request.patch(base + "/api/readiness/" + slug, {
+                headers,
+                data: {
+                  itemId: entry.items[0].id,
+                  completed: true,
+                  revision: entry.revision,
+                  saveId: entry.saveId,
+                  templateVersion: entry.templateVersion,
+                },
+              })
+            ).status(),
+            200,
+          );
+        }
+      }
+      await page.goto(base + "/plan");
+      await page.locator(".plan-entry").first().waitFor();
+      assert.equal(await page.locator(".plan-entry").count(), 2);
+      const cards = await page.locator(".plan-entry h3").allTextContents();
+      await page
+        .getByRole("checkbox", {
+          name: "Pradhan Mantri Jeevan Jyoti Bima Yojana",
+          exact: true,
+        })
+        .uncheck();
+      await page.waitForFunction(
+        () => document.querySelectorAll(".plan-entry").length === 1,
+      );
+      assert((await page.locator(".plan-print").innerText()).includes("[x]"));
+      assert(!(await page.locator(".plan-print").innerText()).includes(email));
+      assert.equal(await page.locator(".plan-owner").count(), 0);
+      await page
+        .getByRole("checkbox", { name: "Include my name on the plan" })
+        .check();
+      await page
+        .locator(".plan-owner")
+        .filter({ hasText: "Additions Citizen" })
+        .waitFor();
+      await page
+        .getByRole("checkbox", { name: "Include my name on the plan" })
+        .uncheck();
+    },
+  );
+  await check(
+    "Browser print produces an A4 PDF with navigation and controls hidden",
+    async () => {
+      await page.evaluate(() => {
+        window.__printCalled = false;
+        window.print = () => {
+          window.__printCalled = true;
+        };
+      });
+      await page.getByRole("button", { name: "Print / save PDF" }).click();
+      assert(await page.evaluate(() => window.__printCalled));
+      await page.emulateMedia({ media: "print" });
+      assert.equal(
+        await page
+          .locator(".dashboard-sidebar")
+          .evaluate((el) => getComputedStyle(el).display),
+        "none",
+      );
+      assert.equal(
+        await page
+          .locator(".plan-controls")
+          .first()
+          .evaluate((el) => getComputedStyle(el).display),
+        "none",
+      );
+      assert.equal(await page.locator(".plan-print").isVisible(), true);
+      const pdf = await page.pdf({
+        path: "reports/preparation-plan.pdf",
+        format: "A4",
+        printBackground: true,
+      });
+      assert.equal(pdf.subarray(0, 4).toString(), "%PDF");
+      assert(pdf.length > 10000);
+      await page.emulateMedia({ media: "screen" });
+    },
+  );
+  await check(
+    "Plan fits seven widths in both languages and empty selection disables print",
+    async () => {
+      for (const lang of ["hi", "en"]) {
+        await language(lang);
+        for (const width of [360, 390, 430, 768, 1024, 1280, 1440]) {
+          await page.setViewportSize({ width, height: 1000 });
+          assert(
+            await page.evaluate(
+              () => document.documentElement.scrollWidth <= innerWidth + 1,
+            ),
+          );
+          if ([390, 1440].includes(width)) {
+            await page.evaluate(() => document.fonts.ready);
+            await page.screenshot({
+              path: `reports/${lang === "hi" ? "hi-" : ""}preparation-plan-${width === 390 ? "mobile" : "desktop"}.png`,
+              fullPage: true,
+            });
+          }
+        }
+      }
+      await page
+        .getByRole("checkbox", {
+          name: "Pradhan Mantri Suraksha Bima Yojana",
+          exact: true,
+        })
+        .uncheck();
+      await page
+        .getByText("Select at least one saved scheme to print.")
+        .waitFor();
+      assert.equal(
+        await page
+          .getByRole("button", { name: "Print / save PDF" })
+          .isDisabled(),
+        true,
+      );
+    },
+  );
   await check("No unexpected runtime or console errors", async () =>
     assert.deepEqual(errors, []),
   );

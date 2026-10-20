@@ -62,6 +62,11 @@ export default function Readiness() {
           {t(" documents and next steps you\u2019ve prepared.")}
         </p>
       </header>
+      <div className="organizer-actions">
+        <Button to="/plan" variant="secondary">
+          {t("Print preparation plan")}
+        </Button>
+      </div>
       <div className="readiness-privacy">
         <ShieldCheck size={21} />
         <div>

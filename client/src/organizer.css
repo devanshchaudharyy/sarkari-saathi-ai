@@ -248,3 +248,133 @@
     grid-template-columns: 1fr;
   }
 }
+.plan-checkbox {
+  display: flex !important;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 0;
+  line-height: 1.6;
+}
+.plan-checkbox input {
+  flex-shrink: 0;
+  accent-color: #5046dd;
+  margin-top: 5px;
+}
+.plan-print {
+  background: #fff;
+  padding: 26px;
+  border-radius: 12px;
+}
+.plan-print h2 {
+  font-size: 1.8rem;
+}
+.plan-tasks {
+  padding-left: 22px;
+}
+.plan-tasks li {
+  padding: 12px 0;
+  break-inside: avoid;
+  line-height: 1.7;
+}
+.plan-tasks p {
+  margin: 6px 0;
+  font-size: 0.9rem;
+}
+.plan-print a {
+  color: #4036b3;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.plan-source-url {
+  display: block;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+  margin-top: 5px;
+  color: #627087;
+}
+.plan-entry small {
+  font-size: 0.8rem;
+}
+.plan-print footer {
+  border-top: 1px solid #dfe3ee;
+  margin-top: 20px;
+  font-size: 0.85rem;
+}
+@media print {
+  @page {
+    size: A4;
+    margin: 15mm;
+  }
+  body.preparation-plan-view {
+    background: white !important;
+    color: black !important;
+  }
+  body.preparation-plan-view .dashboard-sidebar,
+  body.preparation-plan-view .dashboard-top,
+  body.preparation-plan-view .dashboard-footer,
+  body.preparation-plan-view .translation-notice,
+  body.preparation-plan-view .skip-link,
+  body.preparation-plan-view [data-sonner-toaster],
+  body.preparation-plan-view .plan-controls {
+    display: none !important;
+  }
+  body.preparation-plan-view .dashboard,
+  body.preparation-plan-view .dashboard-main,
+  body.preparation-plan-view .dashboard-content,
+  body.preparation-plan-view .plan-page {
+    display: block !important;
+    width: auto !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    background: white !important;
+  }
+  body.preparation-plan-view .plan-print {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    color: #000;
+  }
+  body.preparation-plan-view .plan-print * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+    animation: none !important;
+    transition: none !important;
+    color: #111;
+  }
+  body.preparation-plan-view .plan-entry {
+    border: 0;
+    border-top: 1px solid #bbb;
+    border-radius: 0;
+    margin: 14px 0;
+    padding: 14px 0;
+    break-before: auto;
+  }
+  body.preparation-plan-view .organizer-notice {
+    background: white;
+    padding: 8px 0;
+    font-size: 10pt;
+    border-bottom: 1px solid #bbb;
+  }
+  body.preparation-plan-view .plan-entry h3 {
+    break-after: avoid;
+  }
+  body.preparation-plan-view a {
+    font-size: 9pt;
+  }
+  body.preparation-plan-view .plan-tasks p {
+    font-size: 10pt;
+  }
+  body.preparation-plan-view .plan-print header {
+    break-inside: avoid;
+  }
+  body.preparation-plan-view .plan-print li {
+    orphans: 3;
+    widows: 3;
+  }
+}
+
+@media print {
+ body.preparation-plan-view .plan-print footer { background: transparent !important; min-height: 0 !important; padding: 0 !important; }
+}

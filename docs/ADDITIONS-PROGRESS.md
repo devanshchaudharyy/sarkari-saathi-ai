@@ -6,7 +6,7 @@ Approved sequence: implement, verify and push each addition before starting the 
 2. Personal reminders — complete; verified and pushed before addition 3.
 3. Reviewed catalog management — complete; verified and pushed before addition 4.
 4. Scheme comparison — complete; verified and pushed before addition 5.
-5. Printable preparation plan — pending.
+5. Printable preparation plan — complete; verified and pushed before addition 6.
 6. Account controls — pending.
 
 Each delivery records its executed tests and limitations here. Application statuses and progress are personal records, not verified government decisions. No real email is sent during verification.
@@ -40,3 +40,9 @@ Register an account, then have the trusted local operator run `npm run catalog:r
 Public comparison of two or three live catalog entries: benefits, coverage, eligibility notes, partial document preparation guidance, application steps, source review dates, limitations and official links. Chosen column order is preserved, not ranked. Scheme-only URLs can be shared; invalid, repeated, duplicate or unavailable choices show a safe recovery state. Visitors make no private screening call. Signed-in users may view the existing saved-profile-only screen and missing-fact counts; per-visit answers are never imported or put in URLs. Safe sign-in return retains the comparison. Public preparation previews contain guidance only, never saved task marks or account metadata.
 
 Verification: 299 Node tests (245 API/domain + 23 localization + 18 shortlist + 13 comparison), production build and 18 cumulative addition-browser scenarios. Browser coverage includes two/three columns, direct refresh, invalid choices, protected-report failure while public facts stay visible, anonymous access, sign-in return, exact source links, English/Hindi, seven widths and no unexpected errors. Catalog CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39386376392 .
+
+## 5. Printable preparation plan
+
+Choose saved schemes and print or save a PDF through the browser. Confirmed self-marked tasks, partial-guidance notices, source URLs, review dates and template versions remain readable on A4. Name inclusion is optional and off by default; email, profile facts, timelines and reminders are excluded. Selection resets after refresh. Unavailable templates show an honest notice. No server PDF service or file upload is introduced.
+
+Verification: 303 Node tests (245 API/domain + 23 localization + 18 shortlist + 13 comparison + 4 plan), production build and 21 cumulative addition-browser scenarios. Print media hides navigation, controls and notifications; a real two-page PDF was rendered and visually inspected, with no clipped tasks or private email. English/Hindi screens fit seven widths, empty selections disable printing and the print action is wired to the browser. Comparison CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39387853258 .
