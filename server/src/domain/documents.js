@@ -1,3 +1,4 @@
+import { reviewPending } from "../../../shared/reliability.js";
 export const DOCUMENT_GUIDE_VERSION = "2026-10-20.1";
 export const DOCUMENT_GUIDE_REVIEWED_AT = "2026-10-20";
 const reference = (title, url) => ({ title, url });
@@ -125,7 +126,7 @@ export const documentGuides = {
 };
 export function documentGuideFor(scheme) {
   const items =
-    scheme && !scheme.readinessSuspended
+    scheme && !scheme.readinessSuspended && !reviewPending(scheme)
       ? documentGuides[scheme.slug] || []
       : [];
   return {

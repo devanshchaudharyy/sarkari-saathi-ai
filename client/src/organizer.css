@@ -561,3 +561,114 @@
     gap: 0;
   }
 }
+
+.source-status {
+  padding: 18px 22px;
+  border-radius: 12px;
+  background: #eef4f0;
+  margin: 20px 0;
+  overflow-wrap: anywhere;
+}
+.source-status p {
+  font-size: 0.9rem;
+  line-height: 1.8;
+  margin: 8px 0;
+}
+.source-status small {
+  font-size: 0.78rem;
+  line-height: 1.8;
+  display: block;
+}
+.source-pending,
+.source-due {
+  background: #fff5e5;
+  color: #684312;
+}
+.source-review-panel form {
+  margin-top: 24px;
+}
+.source-review-panel fieldset {
+  border: 0;
+  padding: 0;
+  min-width: 0;
+  display: grid;
+  gap: 18px;
+}
+.source-review-panel label {
+  display: block;
+  line-height: 1.8;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+.source-review-panel select,
+.source-review-panel textarea {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #dfe3ee;
+  border-radius: 8px;
+  background: #fff;
+  color: #24344c;
+  box-sizing: border-box;
+  font: inherit;
+}
+.source-evidence {
+  background: #f5f6fb;
+  padding: 20px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+.source-evidence a {
+  overflow-wrap: anywhere;
+  text-decoration: underline;
+  color: #4036b3;
+}
+.source-history {
+  padding: 14px 0;
+  border-top: 1px solid #e5e7ef;
+}
+.preserve-lines {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.scheme-update-history {
+  list-style: none;
+  padding: 0;
+}
+.scheme-update-history > li {
+  padding: 24px 0;
+  border-top: 1px solid #e5e7ef;
+}
+.scheme-update-history time {
+  display: block;
+  font-size: 0.78rem;
+  color: #647087;
+  margin: 8px 0;
+}
+.scheme-update-history a {
+  color: #4036b3;
+  text-decoration: underline;
+  overflow-wrap: anywhere;
+}
+.scheme-update-card h2 {
+  font-size: 1.4rem;
+  max-width: 100%;
+}
+.catalog-diff > div {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+.catalog-diff section {
+  background: #f5f6fb;
+  padding: 16px;
+  border-radius: 8px;
+  min-width: 0;
+}
+.catalog-diff {
+  font-size: 0.9rem;
+}
+@media (max-width: 700px) {
+  .catalog-diff > div {
+    grid-template-columns: 1fr;
+  }
+}

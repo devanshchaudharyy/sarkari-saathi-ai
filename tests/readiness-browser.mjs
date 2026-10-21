@@ -40,7 +40,18 @@ const account = await registration.json(),
   headers = { Authorization: `Bearer ${account.token}` };
 let sessionToken;
 async function check(name, fn) {
-  await fn();
+  try {
+    await fn();
+  } catch (error) {
+    await page
+      .screenshot({ path: "reports/readiness-failure.png", fullPage: true })
+      .catch(() => {});
+    await writeFile(
+      "reports/readiness-failure.txt",
+      page.url() + "\n" + (await page.locator("body").innerText()),
+    ).catch(() => {});
+    throw error;
+  }
   results.push({ name, status: "passed" });
   console.log(`PASS ${name}`);
 }

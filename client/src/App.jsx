@@ -8,6 +8,7 @@ import WorkspaceLayout from "./layouts/WorkspaceLayout";
 import { AuthProvider } from "./context/AuthContext";
 import Home from "./pages/Home";
 import Loader from "./components/Loader";
+const Updates = lazy(() => import("./pages/Updates"));
 const Documents = lazy(() => import("./pages/Documents"));
 const Account = lazy(() => import("./pages/Account"));
 const AccountLink = lazy(() => import("./pages/AccountLink"));
@@ -46,6 +47,7 @@ function NavigationEffects() {
       "/compare": "Compare schemes",
       "/plan": "Your preparation plan",
       "/account": "Account and privacy",
+      "/updates": "Scheme updates",
       "/forgot-password": "Forgot your password?",
       "/reset-password": "Choose a new password",
       "/verify-email": "Confirm your email",
@@ -175,6 +177,7 @@ export const router = createBrowserRouter([
               { path: "/catalog", element: <CatalogManager /> },
               { path: "/plan", element: <PreparationPlan /> },
               { path: "/account", element: <Account /> },
+              { path: "/updates", element: <Updates /> },
               {
                 path: "/dashboard",
                 element: <Dashboard />,

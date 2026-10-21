@@ -11,6 +11,7 @@ const schema = new mongoose.Schema(
     templateVersion: { type: String, required: true },
     completedIds: { type: [String], default: [] },
     revision: { type: Number, default: 0, min: 0 },
+    noticeReadRevision: { type: Number, default: 0, min: 0 },
   },
   { timestamps: true },
 );

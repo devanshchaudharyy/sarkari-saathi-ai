@@ -3,11 +3,15 @@ import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { documentGuideFor } from "../domain/documents.js";
 import { slugSchema, parseInput, noQuery } from "../utils/input.js";
 import { HttpError } from "../middleware/errorMiddleware.js";
+import { reliabilityFor } from "../../../shared/reliability.js";
+import { todayInIndia } from "../../../shared/applications.js";
 export async function getDocuments(req, res) {
   noQuery(req);
   const slug = parseInput(slugSchema, req.params.slug);
   const scheme = await Scheme.findOne({ slug, ...LIVE_CATALOG })
-    .select("slug name acronym officialUrl readinessSuspended")
+    .select(
+      "slug name acronym officialUrl readinessSuspended reviewedAt nextReviewAt sourceReview publicUpdates publicUpdateRevision reviewedSourceVersion",
+    )
     .lean();
   if (!scheme)
     throw new HttpError(404, "Scheme not found in the current catalog.");
@@ -20,5 +24,6 @@ export async function getDocuments(req, res) {
       officialUrl: scheme.officialUrl,
     },
     guide: documentGuideFor(scheme),
+    reliability: reliabilityFor(scheme, todayInIndia()),
   });
 }

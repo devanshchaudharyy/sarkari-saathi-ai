@@ -1,7 +1,16 @@
+import { staffFixture } from "./support/staff-fixture.mjs";
+import { todayInIndia } from "../shared/applications.js";
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { existsSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
+if (
+  !/^sarkari_saathi_reliability_browser_test_\d+_[a-f0-9]{6}$/.test(
+    process.env.RELIABILITY_ISOLATED_DB || "",
+  ) ||
+  !process.env.MONGO_URI?.endsWith("/" + process.env.RELIABILITY_ISOLATED_DB)
+)
+  throw Error("Use the isolated reliability browser launcher.");
 const base = process.env.FRONTEND_URL || "http://localhost:5176";
 const executablePath =
   process.env.BROWSER_PATH ||
@@ -233,6 +242,344 @@ try {
       assert.equal(saved.entries.find((e) => e.slug === "pmsby").saved, false);
     },
   );
+
+  let otherToken;
+  const panel = () => page.locator(".source-review-panel");
+  const apiRow = async () =>
+    (
+      await (
+        await context.request.get(base + "/api/readiness", {
+          headers: headers(),
+        })
+      ).json()
+    ).entries.find((e) => e.slug === "pmsby");
+  async function catalogPage() {
+    await page.goto(base + "/catalog");
+    await page.locator("#catalog-entry").selectOption("pmsby");
+    await panel()
+      .getByRole("heading", { name: "Keep scheme guidance current" })
+      .waitFor();
+    await panel()
+      .getByLabel("Public source version label", { exact: true })
+      .waitFor();
+  }
+  async function queue(label) {
+    await panel()
+      .getByLabel("Public source version label", { exact: true })
+      .fill(label);
+    await panel()
+      .getByLabel("Private observation note")
+      .fill("Synthetic private observation for isolated browser verification.");
+    await panel()
+      .getByRole("button", { name: "Queue source review", exact: true })
+      .click();
+    await panel().getByText("Pending evidence", { exact: true }).waitFor();
+  }
+  async function resolution(kind, label, summary) {
+    await panel()
+      .getByLabel("Review outcome", { exact: true })
+      .selectOption(kind);
+    await panel()
+      .getByLabel("Public source version label", { exact: true })
+      .fill(label);
+    await panel()
+      .getByLabel("Public change summary", { exact: true })
+      .fill(summary);
+    await panel()
+      .getByRole("button", { name: "Review and confirm outcome", exact: true })
+      .click();
+  }
+  async function confirmOutcome() {
+    await page
+      .getByRole("checkbox", {
+        name: "I checked the official source, the current guidance and this public summary.",
+      })
+      .check();
+    await page
+      .getByRole("button", { name: "Confirm review outcome", exact: true })
+      .click();
+    await panel()
+      .getByRole("button", { name: "Queue source review", exact: true })
+      .waitFor();
+  }
+  await check(
+    "Ordinary accounts cannot review sources; saved schemes establish a notice baseline",
+    async () => {
+      assert.equal(
+        (
+          await context.request.get(base + "/api/catalog/pmsby/review", {
+            headers: headers(),
+          })
+        ).status(),
+        403,
+      );
+      let saved = await (
+        await context.request.put(base + "/api/readiness/pmsby", {
+          headers: headers(),
+          data: {},
+        })
+      ).json();
+      await context.request.patch(base + "/api/readiness/pmsby", {
+        headers: headers(),
+        data: {
+          itemId: "form",
+          completed: true,
+          templateVersion: saved.entry.templateVersion,
+          revision: saved.entry.revision,
+          saveId: saved.entry.saveId,
+        },
+      });
+      assert.equal((await apiRow()).progress.completed, 1);
+      const other = await context.request.post(base + "/api/auth/register", {
+        data: {
+          name: "Other Reliability Citizen",
+          email: "other." + Date.now() + "@example.com",
+          password,
+        },
+      });
+      assert.equal(other.status(), 201);
+      otherToken = (await other.json()).token;
+      assert.equal(
+        (
+          await (
+            await context.request.get(base + "/api/updates", {
+              headers: { Authorization: "Bearer " + otherToken },
+            })
+          ).json()
+        ).unreadCount,
+        0,
+      );
+    },
+  );
+  await check(
+    "Editor source reports pause guidance and preserve a private evidence record",
+    async () => {
+      await staffFixture(email, "editor");
+      await catalogPage();
+      await queue("Observed source version 1");
+      await panel()
+        .getByText(
+          "An administrator must resolve this review. You may prepare and save a catalog draft below.",
+        )
+        .waitFor();
+      assert.equal((await apiRow()).items.length, 0);
+      const detail = await (
+        await context.request.get(base + "/api/schemes/pmsby")
+      ).json();
+      assert.equal(detail.scheme.reliability.state, "pending");
+      assert(!JSON.stringify(detail).includes("Synthetic private observation"));
+      const screening = await (
+        await context.request.get(base + "/api/eligibility", {
+          headers: headers(),
+        })
+      ).json();
+      assert.equal(
+        screening.results.find((e) => e.slug === "pmsby").assessment.status,
+        "not_assessed",
+      );
+    },
+  );
+  await check(
+    "Pending source changes appear on public guides and only affected users receive notices",
+    async () => {
+      await page.goto(base + "/schemes/pmsby/documents");
+      await page
+        .getByText("Source change reported — review pending", { exact: true })
+        .waitFor();
+      await page
+        .getByRole("heading", {
+          name: "No reviewed document guide is available",
+        })
+        .waitFor();
+      await page.goto(base + "/readiness?scheme=pmsby");
+      await page
+        .getByRole("link", {
+          name: "Unread update for this saved scheme",
+          exact: true,
+        })
+        .click();
+      await page.waitForURL("**/updates");
+      await page.getByText("Unread updates", { exact: true }).waitFor();
+      assert.equal(
+        (
+          await (
+            await context.request.get(base + "/api/updates", {
+              headers: { Authorization: "Bearer " + otherToken },
+            })
+          ).json()
+        ).entries.length,
+        0,
+      );
+    },
+  );
+  await check(
+    "Administrator review supports both languages, responsive layouts and dialog focus",
+    async () => {
+      await staffFixture(email, "admin");
+      await catalogPage();
+      await panel()
+        .getByLabel("Public source version label", { exact: true })
+        .fill("Reviewed source version 1");
+      await panel()
+        .getByLabel("Public change summary", { exact: true })
+        .fill(
+          "The official source review found no change to the current published guidance.",
+        );
+      await responsive("source-review");
+      await panel()
+        .getByRole("button", {
+          name: "Review and confirm outcome",
+          exact: true,
+        })
+        .click();
+      await page.getByRole("dialog").waitFor();
+      await page.keyboard.press("Escape");
+      assert.equal(
+        await panel()
+          .getByRole("button", {
+            name: "Review and confirm outcome",
+            exact: true,
+          })
+          .evaluate((el) => el === document.activeElement),
+        true,
+      );
+      await panel()
+        .getByRole("button", {
+          name: "Review and confirm outcome",
+          exact: true,
+        })
+        .click();
+      await confirmOutcome();
+      assert.equal((await apiRow()).progress.completed, 1);
+      assert((await apiRow()).documentGuideAvailable);
+    },
+  );
+  await check(
+    "Update notices fit seven widths; failed acknowledgement preserves authentication and retry succeeds",
+    async () => {
+      await page.goto(base + "/updates");
+      await page.getByText("Unread updates", { exact: true }).waitFor();
+      await responsive("scheme-updates");
+      await page.route("**/api/updates/pmsby/read", (r) => r.abort());
+      await page
+        .getByRole("button", { name: "Mark these updates read", exact: true })
+        .click();
+      await page.getByRole("alert").waitFor();
+      assert.equal(
+        await page.evaluate(() =>
+          localStorage.getItem("sarkarisaathi.token.v1"),
+        ),
+        token,
+      );
+      await page.unroute("**/api/updates/pmsby/read");
+      await page
+        .getByRole("button", { name: "Reload updates", exact: true })
+        .click();
+      await page
+        .getByRole("button", { name: "Mark these updates read", exact: true })
+        .click();
+      await page.getByText("Updates read", { exact: true }).waitFor();
+      await page.reload();
+      await page.getByText("Updates read", { exact: true }).waitFor();
+      assert.equal((await apiRow()).progress.completed, 1);
+    },
+  );
+  await check(
+    "Reviewed publication exposes catalog differences and keeps old rules and document guides suspended",
+    async () => {
+      await catalogPage();
+      await queue("Observed source version 2");
+      await page
+        .getByLabel("Benefit explanation", { exact: true })
+        .fill("Synthetic published note for isolated review tests.");
+      await Promise.all([
+        page.waitForResponse(
+          (response) =>
+            response.url().endsWith("/api/catalog/pmsby") &&
+            response.request().method() === "PATCH" &&
+            response.status() === 200,
+        ),
+        page
+          .getByRole("button", { name: "Save editorial draft", exact: true })
+          .click(),
+      ]);
+      await panel()
+        .locator('option[value="publish"]:not([disabled])')
+        .waitFor({ state: "attached" });
+      assert.equal(await panel().count(), 1);
+      await resolution(
+        "publish",
+        "Reviewed source version 2",
+        "The reviewed catalog note changed. Older automated guidance remains suspended pending a separate rule review.",
+      );
+      await confirmOutcome();
+      const detail = await (
+        await context.request.get(base + "/api/schemes/pmsby")
+      ).json();
+      assert.equal(
+        detail.scheme.benefitNote,
+        "Synthetic published note for isolated review tests.",
+      );
+      assert.equal(detail.scheme.preparation.items.length, 0);
+      await page.goto(base + "/updates");
+      await page
+        .getByText("Catalog content updated", { exact: false })
+        .first()
+        .waitFor();
+      await page
+        .getByText("Published catalog differences", { exact: true })
+        .first()
+        .click();
+      await page
+        .locator(".catalog-diff")
+        .getByText("Synthetic published note for isolated review tests.", {
+          exact: true,
+        })
+        .waitFor();
+    },
+  );
+  await check(
+    "Source review can archive a scheme while keeping a clear affected-user notice",
+    async () => {
+      await catalogPage();
+      await queue("Observed archive version");
+      await resolution(
+        "archive",
+        "Reviewed archive version",
+        "The isolated test scheme was archived after staff source review.",
+      );
+      await page
+        .getByRole("checkbox", {
+          name: "I checked the official source, the current guidance and this public summary.",
+        })
+        .check();
+      await page
+        .getByRole("button", { name: "Confirm review outcome", exact: true })
+        .click();
+      await panel()
+        .getByText("Publish a scheme before reporting a source change.")
+        .waitFor();
+      assert.equal(
+        (await context.request.get(base + "/api/schemes/pmsby")).status(),
+        404,
+      );
+      await page.goto(base + "/updates");
+      await page
+        .getByText("Scheme archived", { exact: false })
+        .first()
+        .waitFor();
+      const source = await (
+        await context.request.get(base + "/api/updates", { headers: headers() })
+      ).json();
+      assert.equal(source.entries[0].available, false);
+    },
+  );
+  if (otherToken)
+    await context.request.delete(base + "/api/account", {
+      headers: { Authorization: "Bearer " + otherToken },
+      data: { password, confirmation: "DELETE" },
+    });
+
   await check(
     "No unexpected document-guide runtime or console errors",
     async () => assert.deepEqual(errors, []),

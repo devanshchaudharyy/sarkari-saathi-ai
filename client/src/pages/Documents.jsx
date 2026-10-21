@@ -3,6 +3,7 @@ import { Link, useLocation, useParams } from "react-router-dom";
 import { FileSearch, ArrowUpRight, Landmark } from "lucide-react";
 import useSchemes from "../hooks/useSchemes";
 import { useLanguage } from "../i18n/useLanguage";
+import SourceStatus from "../components/SourceStatus";
 import Button from "../components/Button";
 import Loader from "../components/Loader";
 export default function Documents() {
@@ -60,6 +61,7 @@ export default function Documents() {
           "These are partial preparation guides. We do not collect documents, identity numbers or bank details. The issuing authority determines current requirements and acceptance.",
         )}
       </p>
+      <SourceStatus reliability={resource.data?.reliability} />
       {resource.loading ? (
         <Loader />
       ) : resource.error ? (

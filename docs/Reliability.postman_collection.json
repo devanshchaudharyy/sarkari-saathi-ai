@@ -1,12 +1,73 @@
 {
   "info": {
     "name": "SarkariSaathi document guidance and reliability",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Public guides, manual staff source review and saved-scheme notices. Use an existing account token. Grant staff roles using the documented local operator command. Mutations are skipped unless enableReviewMutations=true. Practice only against disposable catalog data; report pauses guidance. Get staff review again after every mutation. No external websites are fetched."
   },
   "variable": [
     {
       "key": "baseUrl",
       "value": "http://localhost:5176/api"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "slug",
+      "value": "pmsby"
+    },
+    {
+      "key": "enableReviewMutations",
+      "value": "false"
+    },
+    {
+      "key": "reviewId",
+      "value": ""
+    },
+    {
+      "key": "reviewRevision",
+      "value": "0"
+    },
+    {
+      "key": "sourceUrl",
+      "value": ""
+    },
+    {
+      "key": "sourceVersion",
+      "value": ""
+    },
+    {
+      "key": "observedOn",
+      "value": ""
+    },
+    {
+      "key": "privateNote",
+      "value": ""
+    },
+    {
+      "key": "publicSummary",
+      "value": ""
+    },
+    {
+      "key": "nextReviewAt",
+      "value": ""
+    },
+    {
+      "key": "resolution",
+      "value": "no_change"
+    },
+    {
+      "key": "saveId",
+      "value": ""
+    },
+    {
+      "key": "seenRevision",
+      "value": "0"
+    },
+    {
+      "key": "updateRevision",
+      "value": "0"
     }
   ],
   "item": [
@@ -22,7 +83,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+              "pm.test('Safe public guidance',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.be.a('boolean');pm.expect(d.reliability.state).to.be.oneOf(['reviewed','due','pending']);if(!d.guide.available)pm.expect(d.guide.items).to.eql([]);});"
             ]
           }
         }
@@ -40,7 +101,7 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+              "pm.test('Safe public guidance',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.be.a('boolean');pm.expect(d.reliability.state).to.be.oneOf(['reviewed','due','pending']);if(!d.guide.available)pm.expect(d.guide.items).to.eql([]);});"
             ]
           }
         }
@@ -58,7 +119,219 @@
           "script": {
             "type": "text/javascript",
             "exec": [
-              "pm.test('Reviewed public guide',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.eql(true);pm.expect(d.guide.items.length).to.be.above(0);});"
+              "pm.test('Safe public guidance',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);pm.expect(d.guide.available).to.be.a('boolean');pm.expect(d.reliability.state).to.be.oneOf(['reviewed','due','pending']);if(!d.guide.available)pm.expect(d.guide.items).to.eql([]);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff - load review and current revision",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/catalog/{{slug}}/review"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Staff review',()=>{pm.response.to.have.status(200);const r=pm.response.json().review;pm.collectionVariables.set('reviewId',r.id);pm.collectionVariables.set('reviewRevision',r.revision);if(r.sources.length)pm.collectionVariables.set('sourceUrl',r.sources[0].url);});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Staff - report source change (explicit opt-in)",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{reviewId}}\",\n  \"revision\": {{reviewRevision}},\n  \"sourceUrl\": \"{{sourceUrl}}\",\n  \"versionLabel\": \"{{sourceVersion}}\",\n  \"observedOn\": \"{{observedOn}}\",\n  \"note\": \"{{privateNote}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/catalog/{{slug}}/review/report"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.collectionVariables.get('enableReviewMutations')!=='true')pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Report queued',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - resolve loaded review (reload staff review first)",
+      "request": {
+        "method": "POST",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"id\": \"{{reviewId}}\",\n  \"revision\": {{reviewRevision}},\n  \"resolution\": \"{{resolution}}\",\n  \"summary\": \"{{publicSummary}}\",\n  \"versionLabel\": \"{{sourceVersion}}\",\n  \"nextReviewAt\": \"{{nextReviewAt}}\",\n  \"confirmed\": true\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/catalog/{{slug}}/review/resolve"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.collectionVariables.get('enableReviewMutations')!=='true')pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Review resolved',()=>pm.response.to.have.status(200));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Citizen - own saved-scheme notices",
+      "request": {
+        "method": "GET",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "url": "{{baseUrl}}/updates"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Owner notices',()=>{pm.response.to.have.status(200);const d=pm.response.json();pm.expect(d.success).to.eql(true);const e=d.entries.find(e=>e.slug===pm.collectionVariables.get('slug'));if(e){pm.collectionVariables.set('saveId',e.saveId);pm.collectionVariables.set('seenRevision',e.seenRevision);pm.collectionVariables.set('updateRevision',e.reliability.revision);}});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Citizen - acknowledge loaded notices (explicit opt-in)",
+      "request": {
+        "method": "PATCH",
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{token}}",
+              "type": "string"
+            }
+          ]
+        },
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"saveId\": \"{{saveId}}\",\n  \"seenRevision\": {{seenRevision}},\n  \"revision\": {{updateRevision}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{baseUrl}}/updates/{{slug}}/read"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if(pm.collectionVariables.get('enableReviewMutations')!=='true')pm.execution.skipRequest();"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Acknowledged',()=>pm.response.to.have.status(200));"
             ]
           }
         }

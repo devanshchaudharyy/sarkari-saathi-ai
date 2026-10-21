@@ -56,3 +56,7 @@ Synthetic test accounts, local production server, 20 October 2026.
 | reset-password                      | [View](reset-password-desktop.png)   | [View](reset-password-mobile.png)   | [View](hi-reset-password-desktop.png)   | [View](hi-reset-password-mobile.png)   |
 | verify-email                        | [View](verify-email-desktop.png)     | [View](verify-email-mobile.png)     | [View](hi-verify-email-desktop.png)     | [View](hi-verify-email-mobile.png)     |
 | Document-acquisition guides         | [View](document-guides-desktop.png)  | [View](document-guides-mobile.png)  | [View](hi-document-guides-desktop.png)  | [View](hi-document-guides-mobile.png)  |
+| Staff source review                 | [View](source-review-desktop.png)    | [View](source-review-mobile.png)    | [View](hi-source-review-desktop.png)    | [View](hi-source-review-mobile.png)    |
+| Saved-scheme update notices          | [View](scheme-updates-desktop.png)   | [View](scheme-updates-mobile.png)   | [View](hi-scheme-updates-desktop.png)   | [View](hi-scheme-updates-mobile.png)   |
+
+Reliability captures were refreshed on **21 October 2026**, at 1440 × 1000 and 390 × 1000 before full-page capture. Staff source reports and notice summaries are synthetic workflow fixtures in an isolated test database; they do not describe an actual government policy change. Run `npm run build` and `npm run test:reliability-browser` to reproduce these twelve reliability images without changing the local development catalog. The combined gallery now includes 88 images.

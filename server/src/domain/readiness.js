@@ -1,4 +1,6 @@
 import { documentGuideFor } from "./documents.js";
+import { reviewPending, reliabilityFor } from "../../../shared/reliability.js";
+import { todayInIndia } from "../../../shared/applications.js";
 export const READINESS_VERSION = "2026-10-08.1";
 export const READINESS_REVIEWED_AT = "2026-10-08";
 const ref = (title, url) => ({ title, url });
@@ -196,7 +198,9 @@ export const readinessTemplates = {
 export function readinessEntry(scheme, saved) {
   const slug = scheme?.slug || saved.slug;
   const template =
-    scheme && !scheme.readinessSuspended ? readinessTemplates[slug] : null;
+    scheme && !scheme.readinessSuspended && !reviewPending(scheme)
+      ? readinessTemplates[slug]
+      : null;
   const versionChanged = !!saved && saved.templateVersion !== READINESS_VERSION;
   const completed = new Set(versionChanged ? [] : saved?.completedIds || []);
   const guides = scheme ? documentGuideFor(scheme) : { items: [] };
@@ -209,6 +213,11 @@ export function readinessEntry(scheme, saved) {
   const done = items.filter((i) => i.completed).length;
   return {
     slug,
+    reliability: scheme ? reliabilityFor(scheme, todayInIndia()) : null,
+    noticeUnread:
+      !!saved &&
+      !!scheme &&
+      (scheme.publicUpdateRevision || 0) > (saved.noticeReadRevision || 0),
     documentGuideAvailable: guides.items.length > 0,
     name: scheme?.name || slug,
     acronym: scheme?.acronym || "Unavailable",

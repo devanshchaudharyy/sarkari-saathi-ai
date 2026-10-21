@@ -1,4 +1,6 @@
 import { readinessEntry } from "../domain/readiness.js";
+import { reliabilityFor } from "../../../shared/reliability.js";
+import { todayInIndia } from "../../../shared/applications.js";
 import { LIVE_CATALOG } from "../../../shared/catalog.js";
 import { z } from "zod";
 import Scheme from "../models/Scheme.js";
@@ -98,12 +100,13 @@ export async function getScheme(req, res) {
     ...LIVE_CATALOG,
   })
     .select(
-      "slug name acronym category level states authority summary benefitLabel benefitNote benefits eligibility applicationSteps caveats officialUrl sources reviewedAt screeningSuspended readinessSuspended -_id",
+      "slug name acronym category level states authority summary benefitLabel benefitNote benefits eligibility applicationSteps caveats officialUrl sources reviewedAt screeningSuspended readinessSuspended sourceReview nextReviewAt publicUpdates publicUpdateRevision reviewedSourceVersion -_id",
     )
     .maxTimeMS(5000)
     .lean();
   if (!scheme) throw new HttpError(404, "Scheme not found in this catalog.");
   const preview = readinessEntry(scheme, null);
+  scheme.reliability = reliabilityFor(scheme, todayInIndia());
   scheme.preparation = {
     reviewedAt: preview.reviewedAt,
     templateVersion: preview.templateVersion,
@@ -115,5 +118,13 @@ export async function getScheme(req, res) {
     })),
   };
   delete scheme.readinessSuspended;
+  for (const field of [
+    "sourceReview",
+    "nextReviewAt",
+    "publicUpdates",
+    "publicUpdateRevision",
+    "reviewedSourceVersion",
+  ])
+    delete scheme[field];
   res.set("Cache-Control", "no-store").json({ success: true, scheme });
 }

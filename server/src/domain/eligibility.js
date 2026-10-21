@@ -1,4 +1,5 @@
 // Deterministic, partial screening for NEW applications. Not an approval engine.
+import { reviewPending } from "../../../shared/reliability.js";
 export const RULE_VERSION = "2026-10-08.1";
 export const RULE_REVIEWED_AT = "2026-10-08";
 const source = (title, url) => ({ title, url });
@@ -499,9 +500,10 @@ const definitions = {
 };
 export function assessSchemes(schemes, profile = {}, answers = {}) {
   return schemes.map((scheme) => {
-    const definition = scheme.screeningSuspended
-      ? null
-      : definitions[scheme.slug];
+    const definition =
+      scheme.screeningSuspended || reviewPending(scheme)
+        ? null
+        : definitions[scheme.slug];
     const rules = definition?.rules(profile, answers) || [];
     const status = !definition
       ? "not_assessed"
@@ -515,6 +517,7 @@ export function assessSchemes(schemes, profile = {}, answers = {}) {
       .map((rule) => rule.input);
     return {
       slug: scheme.slug,
+      reviewPending: reviewPending(scheme),
       name: scheme.name,
       acronym: scheme.acronym,
       category: scheme.category,

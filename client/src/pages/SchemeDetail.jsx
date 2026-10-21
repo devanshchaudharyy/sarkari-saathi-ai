@@ -11,6 +11,7 @@ import {
   Check,
   Landmark,
 } from "lucide-react";
+import SourceStatus from "../components/SourceStatus";
 import Button from "../components/Button";
 import { schemeIcons } from "../components/SchemeCard";
 import useSchemes from "../hooks/useSchemes";
@@ -192,6 +193,7 @@ export default function SchemeDetail() {
                   </div>
                 </div>
               </section>
+              <SourceStatus reliability={scheme.reliability} />
               <section
                 className="scheme-section scheme-source-section"
                 id="official-sources"

@@ -1,4 +1,6 @@
 import catalogRoutes from "./routes/catalogRoutes.js";
+import sourceReviewRoutes from "./routes/sourceReviewRoutes.js";
+import updateRoutes from "./routes/updateRoutes.js";
 import express from "express";
 import cors from "cors";
 import helmet from "helmet";
@@ -43,7 +45,9 @@ app.use("/api/eligibility", eligibilityRoutes);
 app.use("/api/readiness", readinessRoutes);
 app.use("/api/applications", applicationRoutes);
 app.use("/api/reminders", reminderRoutes);
+app.use("/api/catalog", sourceReviewRoutes);
 app.use("/api/catalog", catalogRoutes);
+app.use("/api/updates", updateRoutes);
 // An API miss must keep its JSON contract even when the client is also served.
 app.use("/api", (req, res, next) =>
   next(new HttpError(404, "Endpoint not found.")),

@@ -71,4 +71,22 @@ Account-controls CI passed: https://github.com/devanshchaudharyy/sarkari-saathi-
 
 ## 7. Document-acquisition guidance
 
-Complete: five partial source-backed guides across three existing schemes, public direct links, preparation integration, explicit unknown fees/validity and optional new Aadhaar enrolment. No private document data is collected. Verified with 333 Node checks, production build and eight new browser scenarios plus 19 preparation regressions, English/Hindi at seven widths. Detailed evidence and constraints are in RELIABILITY.md. Source-review work starts after this commit is pushed.
+Complete: five partial source-backed guides across three existing schemes, public direct links, preparation integration, explicit unknown fees/validity and optional new Aadhaar enrolment. No private document data is collected. Verified with 333 Node checks, production build and eight new browser scenarios plus 19 preparation regressions, English/Hindi at seven widths. Detailed evidence and constraints are in RELIABILITY.md. Pushed as `399a7e7` before source-review implementation; [GitHub CI passed](https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions/runs/39453924054).
+
+## 8. Human source review and saved-scheme notices
+
+Manual staff reports capture private evidence, a linked official source and a staff-supplied public version label. Queuing a report immediately pauses older screening, preparation and document guidance. Administrators explicitly confirm no-change, reviewed-draft publication or archive outcomes. Public review dates and scheduled review status are separate from government confirmation. No-change preserves stored marks/private drafts; publication keeps older rule/template guidance suspended for separate code review. Publication/archive controls cannot bypass a pending review.
+
+Private `/updates` pages show affected saved schemes, safe public summaries, shortened catalog before/after previews, archive notices and read acknowledgements. Owner, save-ID and revision checks protect read state; acknowledging an older loaded revision leaves newer events unread. Reading notices never changes checklist progress or its timestamps. Histories are bounded and missing older events are disclosed. Review dates are advisory when overdue; reported changes pause guidance. There is no scraping, automatic policy detection, external message delivery or official application-status integration.
+
+### Release checklist
+
+- [x] Dedicated local database tests cover roles, revocation, privacy, validation, stale/concurrent edits, review outcomes, guidance suspension/restoration and notice isolation.
+- [x] Browser source reports, reviewed publications and archives run in a unique disposable database/server, leaving the development catalog untouched.
+- [x] Responsive English/Hindi interfaces, native confirmation/escape focus, failed acknowledgement recovery and persisted read state verified.
+- [x] API/operator documentation and opt-in Postman mutations include publication and data-retention limits.
+- [x] Final local regressions and refreshed screenshots recorded below; GitHub verification runs on the delivery push.
+
+Verification on **21 October 2026**: **354 Node tests** (296 API/domain/environment/lifecycle + 23 localization + 18 shortlist + 13 comparison + 4 plan), production build and **146 browser scenarios** (15 document/reliability + 10 production + 28 earlier additions + 19 preparation + 16 shortlist + 19 browsing + 20 screening + 19 language). All completed with zero unexpected runtime/console errors. Source-review and notice interfaces were checked in English/Hindi at 360, 390, 430, 768, 1024, 1280 and 1440 pixels. Eight new source-review/notice screenshots and four refreshed guide captures bring the committed gallery to 88 images. All eight Postman request definitions and scripts passed syntax checks; desktop Postman was not run.
+
+The browser verification found and fixed duplicate React sibling keys after a draft save, a stale-form timing assumption in the test, a missing Hindi heading and an enabled normal-publish button during pending review. An initial profile-navigation timeout did not recur during the complete stable-build regression run. No new Lighthouse score, real citizen study, official policy change or external SMTP delivery is claimed. [GitHub Actions](https://github.com/devanshchaudharyy/sarkari-saathi-ai/actions) verifies the pushed commit; the delivery message records its observed result.

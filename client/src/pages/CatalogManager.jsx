@@ -5,6 +5,7 @@ import useStaffRole from "../hooks/useStaffRole";
 import { useLanguage } from "../i18n/useLanguage";
 import Button from "../components/Button";
 import Field from "../components/Field";
+import SourceReviewPanel from "../components/SourceReviewPanel";
 import ConfirmDialog from "../components/ConfirmDialog";
 import { SCHEME_CATEGORIES } from "../../../shared/schemes.js";
 import { STATES_AND_UTS } from "../../../shared/profile.js";
@@ -136,15 +137,28 @@ function CatalogWorkspace({ role }) {
                 <option key={row.id} value={row.slug}>
                   {row.current.acronym} · {t(row.name)} ·{" "}
                   {t(row.published ? "Published" : "Not published")}
-                  {row.draft ? " *" : ""}
+                  {row.draft ? " *" : ""}{" "}
+                  {row.reliability?.state === "pending"
+                    ? t("Review pending")
+                    : row.reliability?.state === "due"
+                      ? t("Review due")
+                      : ""}
                 </option>
               ))}
             </select>
           </label>
           {(creating || entry) && (
             <>
+              {entry && (
+                <SourceReviewPanel
+                  key={`review-${entry.id}-${entry.revision}`}
+                  entry={entry}
+                  role={role}
+                  onChanged={resource.reload}
+                />
+              )}
               <CatalogForm
-                key={creating ? "new" : `${entry.id}-${entry.revision}`}
+                key={creating ? "new" : `draft-${entry.id}-${entry.revision}`}
                 entry={entry}
                 busy={resource.busy}
                 onSave={async (data) => {
@@ -184,7 +198,9 @@ function CatalogWorkspace({ role }) {
                     {role === "admin" && (
                       <>
                         <Button
-                          disabled={resource.busy || !entry.draft}
+                          disabled={
+                            resource.busy || !entry.draft || entry.reviewPending
+                          }
                           onClick={() => {
                             setAction("publish");
                             setAttested(false);
@@ -195,7 +211,7 @@ function CatalogWorkspace({ role }) {
                         {entry.published && (
                           <Button
                             variant="danger"
-                            disabled={resource.busy}
+                            disabled={resource.busy || entry.reviewPending}
                             onClick={() => {
                               setAction("archive");
                               setAttested(false);
@@ -225,6 +241,10 @@ function CatalogWorkspace({ role }) {
                                 publish: "Published",
                                 archive: "Archived",
                                 discard: "Draft discarded",
+                                review_requested: "Review pending",
+                                review_no_change: "Review completed",
+                                review_publish: "Published",
+                                review_archive: "Archived",
                               }[event.action] || event.action,
                             )}{" "}
                             · {t("Revision")} {event.revision}

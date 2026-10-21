@@ -7,6 +7,7 @@ import {
   Info,
   LoaderCircle,
 } from "lucide-react";
+import SourceStatus from "./SourceStatus";
 import Button from "./Button";
 import { categoryLabel } from "../../../shared/schemes";
 export default function ReadinessCard({
@@ -44,6 +45,16 @@ export default function ReadinessCard({
           )}
         </span>
       </div>
+      {entry.reliability?.state !== "reviewed" && (
+        <SourceStatus reliability={entry.reliability} />
+      )}
+      {entry.noticeUnread && (
+        <p className="readiness-warning">
+          <Button to="/updates" variant="ghost">
+            {t("Unread update for this saved scheme")}
+          </Button>
+        </p>
+      )}
       {!entry.available ? (
         <div className="readiness-warning" role="note">
           <Info size={18} />

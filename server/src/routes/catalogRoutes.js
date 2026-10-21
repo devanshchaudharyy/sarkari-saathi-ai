@@ -14,6 +14,13 @@ import {
 } from "../utils/input.js";
 import { catalogInput, searchTextFor } from "../domain/catalogInput.js";
 import { catalogData, CATALOG_FIELDS } from "../../../shared/catalog.js";
+import {
+  makeUpdate,
+  updatePush,
+  reviewPending,
+  reliabilityFor,
+} from "../../../shared/reliability.js";
+import { todayInIndia } from "../../../shared/applications.js";
 const router = Router();
 const safe = (row) => ({
   id: String(row._id),
@@ -32,6 +39,8 @@ const safe = (row) => ({
     }),
   ),
   screeningSuspended: !!row.screeningSuspended,
+  reviewPending: reviewPending(row),
+  reliability: reliabilityFor(row, todayInIndia()),
 });
 const revisionFilter = (revision) =>
   revision === 0
@@ -167,6 +176,11 @@ router.post("/:slug/:action", async (req, res) => {
     ...revisionFilter(input.revision),
   }).lean();
   if (!current) throw conflict();
+  if (action !== "discard" && reviewPending(current))
+    throw new HttpError(
+      409,
+      "Resolve the pending source review using its review controls.",
+    );
   let change;
   if (action === "publish") {
     if (!current.editorialDraft)
@@ -182,6 +196,18 @@ router.post("/:slug/:action", async (req, res) => {
     };
   } else if (action === "archive") change = { published: false };
   else change = { editorialDraft: null };
+  const notice =
+    action === "discard"
+      ? null
+      : makeUpdate(current, {
+          kind: action === "archive" ? "archived" : "content_updated",
+          summary:
+            action === "archive"
+              ? "This scheme was archived from the public catalog. Check the official provider before proceeding."
+              : "The catalog team published updated scheme content. Review the changed fields and current official instructions.",
+          after: action === "publish" ? { ...current, ...change } : null,
+        });
+  if (notice) change.publicUpdateRevision = notice.revision;
   const row = await Scheme.findOneAndUpdate(
     {
       _id: input.id,
@@ -193,6 +219,7 @@ router.post("/:slug/:action", async (req, res) => {
       $set: change,
       $inc: { editorialRevision: 1 },
       $push: {
+        ...(notice ? { publicUpdates: updatePush(notice) } : {}),
         editorialHistory: {
           action,
           actor: req.user._id,

@@ -37,6 +37,11 @@ export default function AssessmentCard({ result, onQuestions }) {
         </span>
       </div>
       <h3>{t(result.name)}</h3>
+      {result.reviewPending && (
+        <p className="readiness-warning">
+          {t("Screening is paused while a reported source change is reviewed.")}
+        </p>
+      )}
       <p className="assessment-description">{t(status.description)}</p>
       {assessment.rules.length > 0 && (
         <div className="assessment-rule-count">

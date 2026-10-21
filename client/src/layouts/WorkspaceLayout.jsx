@@ -107,6 +107,15 @@ export default function WorkspaceLayout() {
             <ShieldCheck size={19} />
             {t("Account")}
           </NavLink>
+          <NavLink
+            to="/updates"
+            className={({ isActive }) =>
+              isActive ? "sidebar-active" : "sidebar-link"
+            }
+          >
+            <ShieldCheck size={19} />
+            {t("Scheme updates")}
+          </NavLink>
           {["admin", "editor"].includes(staffRole) && (
             <NavLink
               to="/catalog"
@@ -148,23 +157,25 @@ export default function WorkspaceLayout() {
             <span className="breadcrumb">
               /{" "}
               {t(
-                location.pathname === "/account"
-                  ? "Account and privacy"
-                  : location.pathname === "/catalog"
-                    ? "Manage catalog"
-                    : location.pathname === "/applications"
-                      ? "Applications"
-                      : location.pathname === "/reminders"
-                        ? "Reminders"
-                        : location.pathname === "/profile"
-                          ? "My profile"
-                          : location.pathname === "/eligibility"
-                            ? "Screening"
-                            : location.pathname === "/discover"
-                              ? "My shortlist"
-                              : location.pathname === "/readiness"
-                                ? "Preparation"
-                                : "Overview",
+                location.pathname === "/updates"
+                  ? "Scheme updates"
+                  : location.pathname === "/account"
+                    ? "Account and privacy"
+                    : location.pathname === "/catalog"
+                      ? "Manage catalog"
+                      : location.pathname === "/applications"
+                        ? "Applications"
+                        : location.pathname === "/reminders"
+                          ? "Reminders"
+                          : location.pathname === "/profile"
+                            ? "My profile"
+                            : location.pathname === "/eligibility"
+                              ? "Screening"
+                              : location.pathname === "/discover"
+                                ? "My shortlist"
+                                : location.pathname === "/readiness"
+                                  ? "Preparation"
+                                  : "Overview",
               )}
             </span>
           </span>

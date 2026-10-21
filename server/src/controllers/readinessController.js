@@ -1,4 +1,5 @@
 import { LIVE_CATALOG } from "../../../shared/catalog.js";
+import { reviewPending } from "../../../shared/reliability.js";
 import { z } from "zod";
 import SavedScheme from "../models/SavedScheme.js";
 import Scheme from "../models/Scheme.js";
@@ -81,6 +82,7 @@ export async function saveScheme(req, res) {
           templateVersion: READINESS_VERSION,
           completedIds: [],
           revision: 0,
+          noticeReadRevision: scheme.publicUpdateRevision || 0,
           createdAt: new Date(),
           updatedAt: new Date(),
         },
@@ -105,7 +107,10 @@ export async function updateReadiness(req, res) {
   const value = slug(req),
     input = parse(updateSchema, req.body),
     scheme = await schemeFor(value);
-  const template = scheme.readinessSuspended ? null : readinessTemplates[value];
+  const template =
+    scheme.readinessSuspended || reviewPending(scheme)
+      ? null
+      : readinessTemplates[value];
   if (!template?.some((item) => item.id === input.itemId))
     throw new HttpError(
       400,

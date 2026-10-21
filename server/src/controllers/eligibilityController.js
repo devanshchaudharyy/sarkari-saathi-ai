@@ -30,7 +30,9 @@ async function respond(req, res, answers) {
       .select("age state annualHouseholdIncome updatedAt -_id")
       .lean(),
     Scheme.find(LIVE_CATALOG)
-      .select("slug name acronym category level screeningSuspended -_id")
+      .select(
+        "slug name acronym category level screeningSuspended sourceReview.pending -_id",
+      )
       .sort({ name: 1, slug: 1 })
       .maxTimeMS(5000)
       .lean(),

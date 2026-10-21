@@ -8,6 +8,8 @@ A MERN application for understanding government schemes. Phase 1 provides authen
 
 [Document-acquisition help](http://localhost:5176/schemes/pm-jan-dhan-yojana/documents) now extends preparation for PMJDY, PMSBY and PMJJBY. Guides explain issuing authorities, prerequisites, next steps, fees and acceptance caveats with official references. See [sources and verification](docs/RELIABILITY.md).
 
+Staff can report and resolve source changes in the catalog workspace, with public review dates, version labels and warnings. Pending reviews pause older guidance; reviewed publication shows catalog differences and keeps old rules suspended. [Scheme updates](http://localhost:5176/updates) shows owner-specific notices for saved schemes and supports read acknowledgements. This is a manual editorial workflow, with no automated source monitoring or government status integration. [API, operating instructions and limitations](docs/RELIABILITY.md) explain the roles and review controls.
+
 ## Phase 8: one project, production-ready startup
 
 All phases now live in **`sarkari-saathi-ai` on `main`**. The previous Phase 7 worktree was merged and removed; Git retains its history and branch. The latest local database and authentication configuration were preserved. There is one project folder, with `client`, `server`, `shared`, tests and documentation together.
@@ -24,7 +26,7 @@ The read-only [GitHub verification workflow](.github/workflows/verify.yml) insta
 
 ![Private saved schemes and preparation checklists](docs/screenshots/readiness-desktop.png)
 
-See the [English and Hindi desktop/mobile screenshot gallery](docs/screenshots/README.md) for all ten pages. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate English images; set `SCREENSHOT_LANGUAGE=hi` for Hindi.
+See the [English and Hindi desktop/mobile screenshot gallery](docs/screenshots/README.md) for core pages and later additions. Captured from the completed local production build with synthetic demo data. Run `npm run screenshots` with the API, seeded catalog and frontend running to regenerate core English images; set `SCREENSHOT_LANGUAGE=hi` for Hindi. Feature-specific capture commands are documented in the gallery.
 
 ## Phase 7: explainable scheme shortlist
 
@@ -319,6 +321,9 @@ npm run test:eligibility-browser
 npm run test:readiness-browser
 npm run test:language-browser
 npm run test:discovery-browser
+npm run test:additions-browser
+# Starts its own isolated production server/test database after npm run build:
+npm run test:reliability-browser
 # Running single production server required:
 npm run test:production-browser
 npm run audit:phase8
@@ -337,9 +342,9 @@ See [Phase 8 verification](docs/PHASE8-VERIFICATION.md) for current results. Ear
 - Bearer tokens are stored in localStorage as requested; an XSS vulnerability could expose them. Logout removes the browser token but does not revoke it server-side before expiry. Cookie sessions, refresh tokens, and server revocation are future hardening work.
 - Rate limits are held in process memory and reset on restart; a shared store is needed when scaling to multiple instances. No reverse-proxy trust setting is enabled by default.
 - Profile drafts save only when explicitly submitted. Unsaved changes can be lost if the user chooses to discard them or signs out; there is no offline persistence or autosave. Concurrent saves use the last successful write.
-- Age and household income are self-reported; they are not verified or automatically updated. No account deletion/profile-deletion endpoint is included; saved fields can be emptied and saved again.
+- Age and household income are self-reported; they are not verified or automatically updated. Password-confirmed profile/account deletion is available through account controls; see the cleanup and recovery limits in the account-control guide.
 - Screening and preparation are partial and self-reported; neither establishes entitlement, verified documents or approval. Sources/templates are manually maintained; there is no automatic tracking of official changes. A task mark can become stale outside the app, so confirm the provider's current requirements before applying.
-- Readiness stores only saved schemes and task marks. Removing a saved scheme deletes its progress; resaving starts empty. There is no upload, official application-status tracking or automatic checklist selection from screening answers.
+- Readiness stores saved schemes, task marks and a per-scheme notice-read revision. Removing a saved scheme deletes its progress; resaving starts empty at the current notice baseline. There is no upload, official application-status tracking or automatic checklist selection from screening answers.
 - Account controls use local email previews by default on loopback; remote email requires configured SMTP. No real external email delivery was tested. AI recommendations, chatbot, RAG, document processing and official application submission remain unimplemented.
 - The health endpoint reports that the HTTP API is running; it is not a database readiness probe.
 - The landing illustration is labelled a conceptual preview. Browsing, partial screening and preparation are available through navigation and the dashboard; AI assistance and personalised recommendations remain future work. There are no invented schemes, counts, testimonials, recommendation scores or security certifications.

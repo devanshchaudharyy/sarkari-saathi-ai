@@ -53,6 +53,12 @@ const schemeSchema = new mongoose.Schema(
     readinessSuspended: { type: Boolean, default: false },
     editorialRevision: { type: Number, default: 0 },
     editorialDraft: { type: mongoose.Schema.Types.Mixed, default: null },
+    sourceReview: { type: mongoose.Schema.Types.Mixed, default: null },
+    sourceReviewHistory: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    reviewedSourceVersion: { type: mongoose.Schema.Types.Mixed, default: null },
+    nextReviewAt: { type: String, default: null },
+    publicUpdateRevision: { type: Number, default: 0 },
+    publicUpdates: { type: [mongoose.Schema.Types.Mixed], default: [] },
     editorialHistory: [
       {
         _id: false,

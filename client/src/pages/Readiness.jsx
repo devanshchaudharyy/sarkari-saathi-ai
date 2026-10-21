@@ -63,6 +63,9 @@ export default function Readiness() {
         </p>
       </header>
       <div className="organizer-actions">
+        <Button to="/updates" variant="secondary">
+          {t("View scheme updates")}
+        </Button>
         <Button to="/plan" variant="secondary">
           {t("Print preparation plan")}
         </Button>
